@@ -15,18 +15,20 @@ struct GameMemory
 	uint64 size;
 };
 
-#define MAP_W 59
+#define MAP_W 60
 #define MAP_H 34
 
 struct GameState
 {
-	Texture texture;
-	Texture entities;
 	float time;
 	int map[MAP_H][MAP_W];
 	Vector2 camera_pos;
 	float camera_scale;
 	World world;
+	Texture sheet;
+	Texture entities;
+	bool render_aabbs = false;
+	uint32 player;
 	bool32 initialized;
 };
 
