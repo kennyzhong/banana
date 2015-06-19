@@ -21,6 +21,8 @@ struct RenderContext
 void InitializeContext(RenderContext *context);
 void UnloadContext(RenderContext *context);
 
+void RenderClear(RenderContext *context, uint8 r, uint8 g, uint8 b, uint8 a);
+
 void BeginRenderer(RenderContext *context, 
 	Matrix4 camera = Matrix4_translate(0.0f, 0.0f, 0.0f));
 void EndRenderer();

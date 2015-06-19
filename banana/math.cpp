@@ -56,6 +56,34 @@ void Vector2::operator/=(float f)
 	y /= f;
 }
 
+bool Vector2::operator<(const Vector2 &other)
+{
+	if (x < other.x && y < other.y)
+		return true;
+	return false;
+}
+
+bool Vector2::operator>(const Vector2 &other)
+{
+	if (x > other.x && y > other.y)
+		return true;
+	return false;
+}
+
+bool Vector2::operator<=(const Vector2 &other)
+{
+	if (x <= other.x && y <= other.y)
+		return true;
+	return false;
+}
+
+bool Vector2::operator>=(const Vector2 &other)
+{
+	if (x >= other.x && y >= other.y)
+		return true;
+	return false;
+}
+
 Matrix4 Matrix4::operator*(const Matrix4 &m2)
 {
 	Matrix4 m = { 0 };

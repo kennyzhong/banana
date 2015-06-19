@@ -14,11 +14,16 @@ struct GameMemory
 	uint64 size;
 };
 
+#define MAP_W 120
+#define MAP_H 66
+
 struct GameState
 {
 	Texture texture;
-	float anim_x;
 	float time;
+	int map[MAP_H][MAP_W];
+	Vector2 camera_pos;
+	float camera_scale;
 	bool32 initialized;
 };
 

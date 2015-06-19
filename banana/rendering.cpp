@@ -57,6 +57,17 @@ void UnloadContext(RenderContext *context)
 	glDeleteBuffers(1, &context->ebo);
 }
 
+void RenderClear(RenderContext *context, uint8 r, uint8 g, uint8 b, uint8 a)
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	BeginRenderer(context);
+	// Background letterbox thingy
+	RenderSquare(context, 1920.0f * 0.5f, 1080.0f * 0.5f, 1920.0f, 1080.0f,
+		r, g, b, a);
+	EndRenderer();
+}
+
 void BeginRenderer(RenderContext *context, Matrix4 camera)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, context->vbo);

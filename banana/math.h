@@ -12,6 +12,12 @@ struct Vector2
 	Vector2 operator+(const Vector2 &other);
 	Vector2 operator-(const Vector2 &other);
 
+	bool operator<(const Vector2 &other);
+	bool operator>(const Vector2 &other);
+
+	bool operator<=(const Vector2 &other);
+	bool operator>=(const Vector2 &other);
+
 	void operator+=(const Vector2 &other);
 	void operator-=(const Vector2 &other);
 	
@@ -20,6 +26,7 @@ struct Vector2
 
 	void operator*=(float f);
 	void operator/=(float f);
+
 };
 
 #ifndef M_PI
