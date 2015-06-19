@@ -23,6 +23,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->sheet = LoadTexture("assets/sheet.png");
 		game->entities = LoadTexture("assets/entities.png");
 		//GenerateMap(game);
+		//asdsad
 
 		using namespace tinyxml2;
 		XMLDocument doc;
