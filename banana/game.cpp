@@ -75,8 +75,12 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->camera_scale = 1.0f;
 
 		game->player = CreatePlayer(&game->world, Vector2(100.0f, 100.0f), &game->entities);
-
+		game->color_change_loc = glGetUniformLocation(render_context->diffuse.program, "color_change");
 		game->initialized = true;
+
+		game->red = 1.0f;
+		game->green = 1.0f;
+		game->blue = 1.0f;
 	}
 
 	// Update
@@ -102,6 +106,18 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	if (IsKeyPressed(input, SDL_SCANCODE_F9))
 		game->render_aabbs = !game->render_aabbs;
 
+	if (IsKeyPressed(input, SDL_SCANCODE_F1))
+		if (game->red == 1) game->red = 0;
+		else game->red = 1;
+
+	if (IsKeyPressed(input, SDL_SCANCODE_F2))
+		if (game->green == 1) game->green = 0;
+		else game->green = 1;
+
+	if (IsKeyPressed(input, SDL_SCANCODE_F3))
+		if (game->blue == 1) game->blue = 0;
+		else game->blue = 1;
+
 	if (game->camera_pos.x < 0) game->camera_pos.x = 0;
 	if (game->camera_pos.y < 0) game->camera_pos.y = 0;
 	if (game->camera_pos.x + 1920.0f / game->camera_scale > MAP_W*32.0f + 16.0f)
@@ -113,7 +129,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	RenderClear(render_context, 32, 20, 41, 255);
 	BeginRenderer(render_context, Matrix4_scale(game->camera_scale, game->camera_scale, 1.0f) *
 		Matrix4_translate(-game->camera_pos.x, -game->camera_pos.y, 0.0f));
-
+	glUniform3f(game->color_change_loc, game->red, game->green, game->blue);
 	for (uint32 entity = 0; entity < ENTITY_COUNT; ++entity)
 	{
 		if (HasComponent(&game->world, entity, COMPONENT_SPRITE))

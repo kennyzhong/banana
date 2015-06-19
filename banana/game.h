@@ -29,6 +29,10 @@ struct GameState
 	Texture entities;
 	bool render_aabbs = false;
 	uint32 player;
+	GLint color_change_loc;
+	float red;
+	float green;
+	float blue;
 	bool32 initialized;
 };
 

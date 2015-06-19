@@ -82,11 +82,18 @@ void PlayerUpdate(World *world, uint32 entity, float delta, InputData *input)
 {
 	Transform *t = &world->transforms[entity];
 	Velocity *v = &world->velocities[entity];
+	Sprite *s = &world->sprites[entity];
 
 	if (IsKeyDown(input, SDL_SCANCODE_RIGHT))
+	{
 		v->velocity.x += v->speed;
+		s->y_offset = 0.0f;
+	}
 	if (IsKeyDown(input, SDL_SCANCODE_LEFT))
+	{
 		v->velocity.x -= v->speed;
+		s->y_offset = 64.0f;
+	}
 
 	if (v->grounded && IsKeyDown(input, SDL_SCANCODE_SPACE))
 	{

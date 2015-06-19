@@ -132,10 +132,11 @@ int main(int argc, char *args[])
 	// SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS); 
 	// NOTE(nathan): This seems to give a more consistant result than above
 	timeBeginPeriod(1);
-
+#if _DEBUG
 	HWND console = GetConsoleWindow();
 	if(console != 0)
 	MoveWindow(console, -900, 100, 700, 800, TRUE);
+#endif
 #endif
 	SDL_Init(SDL_INIT_EVERYTHING);
 
