@@ -161,8 +161,11 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="rendering.cpp" />
+    <ClCompile Include="tinyxml2.cpp" />
+    <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="components.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gl_util.h" />
     <ClInclude Include="input.h" />
@@ -170,6 +173,8 @@
     <ClInclude Include="rendering.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="std.h" />
+    <ClInclude Include="tinyxml2.h" />
+    <ClInclude Include="world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
