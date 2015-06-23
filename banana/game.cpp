@@ -75,13 +75,15 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->camera_pos = Vector2(0.0f, 0.0f);
 		game->camera_scale = 1.0f;
 
-		game->player = CreatePlayer(&game->world, Vector2(100.0f, 100.0f), &game->entities);
+		//game->player = CreatePlayer(&game->world, Vector2(100.0f, 100.0f), &game->entities);
 		game->color_change_loc = glGetUniformLocation(render_context->diffuse.program, "color_change");
 		game->initialized = true;
 
 		game->red = 1.0f;
 		game->green = 1.0f;
 		game->blue = 1.0f;
+
+		
 	}
 
 	// Update
@@ -128,6 +130,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	
 	// Rendering
 	RenderClear(render_context, 32, 20, 41, 255);
+
 	BeginRenderer(render_context, Matrix4_scale(game->camera_scale, game->camera_scale, 1.0f) *
 		Matrix4_translate(-game->camera_pos.x, -game->camera_pos.y, 0.0f));
 	glUniform3f(game->color_change_loc, game->red, game->green, game->blue);
@@ -136,7 +139,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		if (HasComponent(&game->world, entity, COMPONENT_SPRITE))
 			SpriteRender(&game->world, entity, render_context);
 	}
-
+	
 	for (int x = 0; x < MAP_W; ++x)
 	{
 		for (int y = 0; y < MAP_H; ++y)
@@ -154,6 +157,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			}
 		}
 	}
+	
 	if (game->render_aabbs)
 	{
 		for (int i = 0; i < AABB_COUNT; ++i)

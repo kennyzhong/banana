@@ -146,5 +146,7 @@ void RenderTexture(RenderContext *context, float x, float y, float rotation, Tex
 	Matrix4 world = Matrix4_scale(width, height, 1.0f) * Matrix4_rotate(rotation, 0.0f, 0.0f, 1.0f)
 		* Matrix4_translate(x, y, 0.0f);
 	glUniformMatrix4fv(context->world_loc, 1, GL_FALSE, &world.data[0]);
+
+	// This isnt causing much lag?? must be the matrix math - got to do simd?? time to learn I guess?
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

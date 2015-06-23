@@ -10,6 +10,7 @@
 [Dd]ebugPublic/
 build/
 bld/
+temp/
 [Oo]bj/
 
 # Roslyn cache directories

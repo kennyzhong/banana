@@ -84,10 +84,24 @@ bool Vector2::operator>=(const Vector2 &other)
 	return false;
 }
 
+bool Vector2::operator==(const Vector2 &other)
+{
+	if (x == other.x && y == other.y)
+		return true;
+	return false;
+}
+
+bool Vector2::operator!=(const Vector2 &other)
+{
+	if (x != other.x || y != other.y)
+		return true;
+	return false;
+}
+
 Matrix4 Matrix4::operator*(const Matrix4 &m2)
 {
 	Matrix4 m = { 0 };
-
+	
 	for (int i = 0; i < 4; ++i)
 	{
 		m.data[i * 4 + 0] =
