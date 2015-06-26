@@ -1,6 +1,7 @@
 #ifndef RENDERING_H
 #define RENDERING_H
 
+#include <string>
 #include "gl_util.h"
 #include "math.h"
 

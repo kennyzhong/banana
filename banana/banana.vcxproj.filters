@@ -31,6 +31,12 @@
     <ClCompile Include="world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="editor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="std.h">
@@ -61,6 +67,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="components.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="editor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

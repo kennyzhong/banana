@@ -22,8 +22,6 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		// Initailzation
 		game->sheet = LoadTexture("assets/sheet.png");
 		game->entities = LoadTexture("assets/entities.png");
-		//GenerateMap(game);
-		//asdsad
 
 		using namespace tinyxml2;
 		XMLDocument doc;
@@ -82,8 +80,6 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->red = 1.0f;
 		game->green = 1.0f;
 		game->blue = 1.0f;
-
-		
 	}
 
 	// Update
@@ -97,7 +93,6 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		if (HasComponent(&game->world, entity, COMPONENT_TRANSFORM | COMPONENT_AABB))
 			AABBUpdate(&game->world, entity);
 	}
-
 	/*
 	Vector2 position = game->world.transforms[game->player].position;
 	Vector2 target;

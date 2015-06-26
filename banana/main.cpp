@@ -5,6 +5,8 @@
 #include "game.h"
 #include "input.h"
 #include "rendering.h"
+#include "editor.h"
+#include "ui.h"
 
 #ifdef _WIN32
 #undef main
@@ -195,11 +197,19 @@ int main(int argc, char *args[])
 	game_memory.size = Megabytes(64);
 	game_memory.memory = SDL_malloc(game_memory.size);
 
+	EditorMemory editor_memory = { 0 };
+	editor_memory.size = Megabytes(64);
+	editor_memory.memory = SDL_malloc(editor_memory.size);
+
 	RenderContext render_context = {};
 	render_context.diffuse = CreateShader("assets/shaders/diffuse.vert", "assets/shaders/diffuse.frag");
 	InitializeContext(&render_context);
 
 	InputData input = { };
+
+	UIContext ui_context = { 0 };
+	ui_context.input = &input;
+	ui_context.render_context = &render_context;
 
 	while (running)
 	{
@@ -235,6 +245,24 @@ int main(int argc, char *args[])
 				input.mouse_pos.y = (((float)window_data.target_height / (float)window_data.vp_height) 
 					* ((float)e.motion.y - window_data.vp_y));
 			}
+			if (e.type == SDL_MOUSEBUTTONDOWN)
+			{
+				if (e.button.button == SDL_BUTTON_LEFT)
+					input.mb_left = true;
+				if (e.button.button == SDL_BUTTON_RIGHT)
+					input.mb_right = true;
+				if (e.button.button == SDL_BUTTON_MIDDLE)
+					input.mb_middle = true;
+			}
+			if (e.type == SDL_MOUSEBUTTONUP)
+			{
+				if (e.button.button == SDL_BUTTON_LEFT)
+					input.mb_left = false;
+				if (e.button.button == SDL_BUTTON_RIGHT)
+					input.mb_right = false;
+				if (e.button.button == SDL_BUTTON_MIDDLE)
+					input.mb_middle = false;
+			}
 		}
 
 		float32 delta = 1.0f / (float32)gameUpdateHz;
@@ -243,6 +271,8 @@ int main(int argc, char *args[])
 
 		uint64 workCounter = GetWallClock();
 		float32 workSecondsElapsed = GetSecondsElapsed(lastCounter, workCounter);
+		// Dont include this in frametime
+		EditorUpdateAndRender(&editor_memory, &input, &render_context, &ui_context, delta);
 
 		float32 secondsElapsedForFrame = workSecondsElapsed;
 
@@ -266,6 +296,9 @@ int main(int argc, char *args[])
 		lastCounter = endCounter;
 		SDL_GL_SwapWindow(window);
 		input.prev_keyboard_state = input.keyboard_state;
+		input.mb_left_prev = input.mb_left;
+		input.mb_right_prev = input.mb_right;
+		input.mb_middle_prev = input.mb_middle;
 
 		uint64 endCycleCount = _rdtsc();
 		uint64 cyclesElapsed = endCycleCount - lastCycleCount;

@@ -119,3 +119,8 @@ Texture LoadTexture(char *filename)
 	stbi_image_free(image_data);
 	return texture;
 }
+
+void UnloadTexture(Texture *texture)
+{
+	glDeleteTextures(1, &texture->id);
+}

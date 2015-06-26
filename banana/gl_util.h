@@ -24,5 +24,6 @@ struct Texture
 };
 
 Texture LoadTexture(char *filename);
+void UnloadTexture(Texture *texture);
 
 #endif // GL_UTIL_H

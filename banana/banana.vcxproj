@@ -95,7 +95,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>W:\prototypes\banana\deps\SDL2-2.0.3\include;W:\prototypes\banana\deps\glew-1.12.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
@@ -113,7 +113,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>W:\prototypes\banana\deps\SDL2-2.0.3\include;W:\prototypes\banana\deps\glew-1.12.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
@@ -161,6 +161,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="editor.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gl_util.cpp" />
     <ClCompile Include="input.cpp" />
@@ -168,10 +169,12 @@
     <ClCompile Include="math.cpp" />
     <ClCompile Include="rendering.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
+    <ClCompile Include="ui.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="components.h" />
+    <ClInclude Include="editor.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gl_util.h" />
     <ClInclude Include="input.h" />
@@ -180,6 +183,7 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="std.h" />
     <ClInclude Include="tinyxml2.h" />
+    <ClInclude Include="ui.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

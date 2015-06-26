@@ -47,6 +47,7 @@ void InitializeContext(RenderContext *context)
 	glUniformMatrix4fv(glGetUniformLocation(context->diffuse.program, "projection"),
 		1, GL_FALSE, &projection.data[0]);
 	glUseProgram(0);
+
 }
 
 void UnloadContext(RenderContext *context)
