@@ -95,15 +95,13 @@ void PlayerUpdate(World *world, uint32 entity, float delta, InputData *input)
 		s->y_offset = 64.0f;
 	}
 
-	if (v->grounded && IsKeyDown(input, SDL_SCANCODE_SPACE))
+	if (IsKeyDown(input, SDL_SCANCODE_UP))
 	{
-		v->grounded = false;
-		v->velocity.y -= 1000.0f;
+		v->velocity.y -= v->speed;
 	}
-
-	if (!v->grounded && !IsKeyDown(input, SDL_SCANCODE_SPACE) && v->velocity.y < 0)
+	if (IsKeyDown(input, SDL_SCANCODE_DOWN))
 	{
-		v->velocity.y *= 0.5f;
+		v->velocity.y += v->speed;
 	}
 }
 
@@ -115,8 +113,6 @@ void VelocityUpdate(World *world, uint32 entity, float delta)
 	Vector2 dim = aabb->aabb->max - aabb->aabb->min;
 	float height = dim.y;
 	float width = dim.x;
-
-	v->velocity.y += 100.0f;
 
 	for (Uint32 i = 0; i < AABB_COUNT; ++i)
 	{
@@ -198,7 +194,7 @@ void VelocityUpdate(World *world, uint32 entity, float delta)
 		}
 	}
 
-	v->velocity.x *= v->friction;
+	v->velocity *= v->friction;
 	t->position += (v->velocity * delta);
 }
 

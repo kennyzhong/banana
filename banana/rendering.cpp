@@ -48,6 +48,8 @@ void InitializeContext(RenderContext *context)
 		1, GL_FALSE, &projection.data[0]);
 	glUseProgram(0);
 
+	context->font = LoadTexture("assets/font.png");
+
 }
 
 void UnloadContext(RenderContext *context)
@@ -56,6 +58,7 @@ void UnloadContext(RenderContext *context)
 	glDeleteVertexArrays(1, &context->vao);
 	glDeleteBuffers(1, &context->vbo);
 	glDeleteBuffers(1, &context->ebo);
+	UnloadTexture(&context->font);
 }
 
 void RenderClear(RenderContext *context, uint8 r, uint8 g, uint8 b, uint8 a)
@@ -151,3 +154,21 @@ void RenderTexture(RenderContext *context, float x, float y, float rotation, Tex
 	// This isnt causing much lag?? must be the matrix math - got to do simd?? time to learn I guess?
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
+
+void RenderString(RenderContext *context, float x, float y, char *text, float spacing)
+{
+	float char_width = context->font.height;
+	float char_height = context->font.height;
+	float total_width = (float)strlen(text) * (char_width + spacing);
+	for (int i = 0; i < strlen(text); ++i)
+	{
+		float xx = (x - (total_width * 0.5f)) + i * (char_width + spacing);
+		float yy = y - (char_height * 0.5f);
+		int font_index = (int)font_text.find(text[i]);
+		float offset_x = font_index * char_width;
+
+		if (font_index >= 0)
+			RenderTexture(context, xx, yy, 0.0f, &context->font, offset_x, 0.0f, char_width, char_height);
+	}
+}
+

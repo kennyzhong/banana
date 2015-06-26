@@ -125,6 +125,12 @@ internal void FixViewport(int w, int h, WindowData *window_data)
 	glViewport(window_data->vp_x, window_data->vp_y, width, height);
 }
 
+enum Mode
+{
+	MODE_GAME,
+	MODE_EDITOR
+};
+
 int main(int argc, char *args[])
 {
 #if _WIN32
@@ -211,6 +217,10 @@ int main(int argc, char *args[])
 	ui_context.input = &input;
 	ui_context.render_context = &render_context;
 
+	Mode mode = MODE_GAME;
+
+	bool game_paused = false;
+
 	while (running)
 	{
 		while (SDL_PollEvent(&e))
@@ -232,6 +242,19 @@ int main(int argc, char *args[])
 					running = false;
 				if (key == SDL_SCANCODE_F11)
 					ToggleFullScreen(window, &window_data);
+				if (key == SDL_SCANCODE_F10)
+				{
+					if (mode == MODE_GAME)
+					{
+						game_paused = true;
+						mode = MODE_EDITOR;
+					}
+					else
+					{
+						mode = MODE_GAME;
+						game_paused = false;
+					}
+				}
 			}
 			if (e.type == SDL_KEYUP)
 			{
@@ -267,12 +290,13 @@ int main(int argc, char *args[])
 
 		float32 delta = 1.0f / (float32)gameUpdateHz;
 
-		GameUpdateAndRender(&game_memory, &input, &render_context, delta);
+		GameUpdateAndRender(&game_memory, &input, &render_context, game_paused, delta);
 
 		uint64 workCounter = GetWallClock();
 		float32 workSecondsElapsed = GetSecondsElapsed(lastCounter, workCounter);
 		// Dont include this in frametime
-		EditorUpdateAndRender(&editor_memory, &input, &render_context, &ui_context, delta);
+		if (mode == MODE_EDITOR)
+			EditorUpdateAndRender(&editor_memory, &input, &render_context, &ui_context, delta);
 
 		float32 secondsElapsedForFrame = workSecondsElapsed;
 
@@ -299,7 +323,6 @@ int main(int argc, char *args[])
 		input.mb_left_prev = input.mb_left;
 		input.mb_right_prev = input.mb_right;
 		input.mb_middle_prev = input.mb_middle;
-
 		uint64 endCycleCount = _rdtsc();
 		uint64 cyclesElapsed = endCycleCount - lastCycleCount;
 		lastCycleCount = endCycleCount;

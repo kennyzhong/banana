@@ -17,21 +17,15 @@ void EditorUpdateAndRender(EditorMemory *editor_memory, InputData *input,
 
 	BeginRenderer(render_context);
 
-	if (GUIButton(ui_context, { 0, 0, 1 }, 400.0f, 400.0f, 300.0f, 100.0f))
+	if (GUIButton(ui_context, { 0, 0, 1 }, "WHITE", 400.0f, 400.0f, 300.0f, 100.0f))
 	{
-		EndRenderer();
-		RenderClear(render_context, 255, 255, 255, 255);
-		BeginRenderer(render_context);
 	}
 
-	if (GUIButton(ui_context, { 0, 0, 2 }, 800.0f, 400.0f, 300.0f, 100.0f))
+	if (GUIButton(ui_context, { 0, 0, 2 }, "RED", 800.0f, 800.0f, 300.0f, 100.0f))
 	{
-		EndRenderer();
-		RenderClear(render_context, 255, 0, 0, 255);
-		BeginRenderer(render_context);
 	}
 
-	SDL_Log("Hot: %d, Active: %d", ui_context->hot.index, ui_context->active.index);
+	//SDL_Log("Hot: %d, Active: %d", ui_context->hot.index, ui_context->active.index);
 
 	EndRenderer();
 

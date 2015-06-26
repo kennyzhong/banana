@@ -22,6 +22,6 @@ struct UIContext
 	RenderContext *render_context;
 };
 
-bool GUIButton(UIContext *ui_context, UIID id, float x, float y, float w, float h);
+bool GUIButton(UIContext *ui_context, UIID id, char *text, float x, float y, float w, float h);
 
 #endif // UI_H

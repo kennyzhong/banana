@@ -61,6 +61,6 @@ int array_find(const T (&a)[size], const T & c)
 {
 	const T *found = std::find(&a[0], &a[size], c);
 	return found == &a[size] ? -1 : found - a;
-}*/
-
+}
+*/
 #endif // STD_H

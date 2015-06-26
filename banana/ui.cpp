@@ -3,7 +3,7 @@
 #include "rendering.h"
 #include "world.h"
 
-bool GUIButton(UIContext *ui_context, UIID id, float x, float y, float w, float h)
+bool GUIButton(UIContext *ui_context, UIID id, char *text, float x, float y, float w, float h)
 {
 	bool result = false;
 	uint8 r = 255;
@@ -35,8 +35,8 @@ bool GUIButton(UIContext *ui_context, UIID id, float x, float y, float w, float 
 	}
 		
 	
-
 	RenderSquare(ui_context->render_context, x, y, w, h, r, 0, 0, 255);
+	RenderString(ui_context->render_context, x, y, text, 5.0f);
 
 	return result;
 }

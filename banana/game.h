@@ -37,6 +37,6 @@ struct GameState
 };
 
 void GameUpdateAndRender(GameMemory *game_memory, InputData *input, 
-	RenderContext *render_context, float delta);
+	RenderContext *render_context, bool &paused, float delta);
 
 #endif // GAME_H

@@ -5,6 +5,8 @@
 #include "gl_util.h"
 #include "math.h"
 
+global_variable std::string font_text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 struct RenderContext
 {
 	GLuint vbo;
@@ -17,6 +19,7 @@ struct RenderContext
 	GLint tex_offset_loc;
 	Shader diffuse;
 	Texture *bound_texture;
+	Texture font;
 };
 
 void InitializeContext(RenderContext *context);
@@ -40,5 +43,7 @@ void RenderLine(RenderContext *context, float x1, float y1, float x2, float y2,
 void RenderTexture(RenderContext *context, float x, float y, Texture *texture);
 void RenderTexture(RenderContext *context, float x, float y, float rotation, 
 	Texture  *texture, float offset_x, float offset_y, float width, float height);
+
+void RenderString(RenderContext *context, float x, float y, char *text, float spacing);
 
 #endif // RENDERING_H
