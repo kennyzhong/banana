@@ -70,9 +70,9 @@ uint32 CreatePlayer(World *world, Vector2 position, Texture *entities)
 {
 	uint32 entity = CreateEntity(world);
 	world->mask[entity] = PLAYER_MASK;
-	Vector2 dim(22.0f, 59.0f);
+	Vector2 dim(11.0f, 30.0f);
 	world->transforms[entity] = { position };
-	world->sprites[entity] = { entities, 0.0f, 0.0f, 64.0f, 64.0f};
+	world->sprites[entity] = { entities, 0.0f, 0.0f, 32.0f, 32.0f};
 	world->com_aabbs[entity].aabb = CreateAABB(world, position - (dim*0.5f), position + (dim*0.5f), AABB_PLAYER);
 	world->velocities[entity] = { Vector2(), 200.0f, 0.7f };
 	return entity;
@@ -92,7 +92,7 @@ void PlayerUpdate(World *world, uint32 entity, float delta, InputData *input)
 	if (IsKeyDown(input, SDL_SCANCODE_LEFT))
 	{
 		v->velocity.x -= v->speed;
-		s->y_offset = 64.0f;
+		s->y_offset = 32.0f;
 	}
 
 	if (IsKeyDown(input, SDL_SCANCODE_UP))

@@ -15,7 +15,7 @@ void main()
  	tex_coord_real = (tex_offset * vec4(tex_coord0, 0, 1.0)).xy;
  	vec4 final_color;
 	if(using_tex == 1)
-		final_color = texture(tex, vec2(tex_coord_real)).rgba;
+		final_color = color * texture(tex, vec2(tex_coord_real)).rgba;
 	else
 		final_color = color;
 	final_color.r *= color_change.r;

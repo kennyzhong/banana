@@ -42,8 +42,10 @@ void RenderLine(RenderContext *context, float x1, float y1, float x2, float y2,
 
 void RenderTexture(RenderContext *context, float x, float y, Texture *texture);
 void RenderTexture(RenderContext *context, float x, float y, float rotation, 
-	Texture  *texture, float offset_x, float offset_y, float width, float height);
+	Texture  *texture, float offset_x, float offset_y, float width, float height,
+	uint8 r = 255, uint8 g = 255, uint8 b = 255, uint8 a = 255);
 
-void RenderString(RenderContext *context, float x, float y, const char *text, float spacing);
+void RenderString(RenderContext *context, float x, float y, const char *text, float spacing,
+	uint8 r = 255, uint8 g = 255, uint8 b = 255, uint8 a = 255);
 
 #endif // RENDERING_H

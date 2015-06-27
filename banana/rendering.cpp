@@ -130,8 +130,16 @@ void RenderTexture(RenderContext *context, float x, float y, Texture *texture)
 }
 
 void RenderTexture(RenderContext *context, float x, float y, float rotation, Texture  *texture,
-	float offset_x, float offset_y, float width, float height)
+	float offset_x, float offset_y, float width, float height,  uint8 r, uint8 g, uint8 b, uint8 a)
 {
+
+	float32 rr = (1.0f / 255.0f)*(float32)r;
+	float32 gg = (1.0f / 255.0f)*(float32)g;
+	float32 bb = (1.0f / 255.0f)*(float32)b;
+	float32 aa = (1.0f / 255.0f)*(float32)a;
+
+	glUniform4f(context->color_loc, rr, gg, bb, aa);
+
 	float scale_x = width / (float)texture->width;
 	float scale_y = height / (float)texture->height;
 	Matrix4 tex_offset = Matrix4_scale(scale_x, scale_y, 1.0f) * 
@@ -139,7 +147,7 @@ void RenderTexture(RenderContext *context, float x, float y, float rotation, Tex
 		(1.0f / (float)texture->width)*offset_x, 
 		(1.0f / (float)texture->height)*offset_y, 0.0f);
 	glUniformMatrix4fv(context->tex_offset_loc, 1, GL_FALSE, &tex_offset.data[0]);
-
+	
 	glUniform1i(context->using_tex_loc, 1);
 	if (context->bound_texture != texture)
 	{
@@ -155,7 +163,8 @@ void RenderTexture(RenderContext *context, float x, float y, float rotation, Tex
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void RenderString(RenderContext *context, float x, float y, const char *text, float spacing)
+void RenderString(RenderContext *context, float x, float y, const char *text, float spacing,
+	uint8 r, uint8 g, uint8 b, uint8 a)
 {
 	float char_width = context->font.height;
 	float char_height = context->font.height;
@@ -168,7 +177,8 @@ void RenderString(RenderContext *context, float x, float y, const char *text, fl
 		float offset_x = font_index * char_width;
 
 		if (font_index >= 0)
-			RenderTexture(context, xx, yy, 0.0f, &context->font, offset_x, 0.0f, char_width, char_height);
+			RenderTexture(context, xx, yy, 0.0f, &context->font, offset_x, 0.0f, char_width, char_height,
+			r, g, b, a);
 	}
 }
 

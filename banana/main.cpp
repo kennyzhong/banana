@@ -291,7 +291,6 @@ int main(int argc, char *args[])
 			EditorUpdateAndRender(&editor_memory, &input, &render_context, &ui_context, delta);
 
 		float32 secondsElapsedForFrame = workSecondsElapsed;
-
 		if (secondsElapsedForFrame < targetSecondsPerFrame)
 		{
 			uint32 sleepMS = (uint32)((1000.0f * (targetSecondsPerFrame - secondsElapsedForFrame)) - 1);
@@ -315,7 +314,7 @@ int main(int argc, char *args[])
 		BeginRenderer(&render_context);
 
 		std::string s = "FRAMETIME " + std::to_string(msPerFrame);
-		RenderString(&render_context, 180.0f, 50.0f, s.c_str(), 0.0f);
+		RenderString(&render_context, 180.0f, 40.0f, s.c_str(), 0.0f);
 
 		EndRenderer();
 
