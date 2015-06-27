@@ -75,5 +75,8 @@
     <ClInclude Include="ui.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="audio.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

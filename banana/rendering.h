@@ -5,7 +5,7 @@
 #include "gl_util.h"
 #include "math.h"
 
-global_variable std::string font_text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+global_variable std::string font_text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.";
 
 struct RenderContext
 {
@@ -44,6 +44,6 @@ void RenderTexture(RenderContext *context, float x, float y, Texture *texture);
 void RenderTexture(RenderContext *context, float x, float y, float rotation, 
 	Texture  *texture, float offset_x, float offset_y, float width, float height);
 
-void RenderString(RenderContext *context, float x, float y, char *text, float spacing);
+void RenderString(RenderContext *context, float x, float y, const char *text, float spacing);
 
 #endif // RENDERING_H

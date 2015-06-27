@@ -100,7 +100,7 @@ void BindShader(Shader *shader)
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-Texture LoadTexture(char *filename)
+Texture LoadTexture(char *filename, GLfloat blending)
 {
 	Texture texture = { 0 };
 	int comps;
@@ -111,8 +111,8 @@ Texture LoadTexture(char *filename)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, blending);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, blending);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 	

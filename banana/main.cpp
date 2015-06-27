@@ -9,11 +9,7 @@
 #include "ui.h"
 
 #ifdef _WIN32
-#undef main
 #include <windows.h>
-#define _rdtsc __rdtsc
-#else
-#include <x86intrin.h>
 #endif // _WIN32
 
 #define Kilobytes(value) ((value)*1024LL)
@@ -179,10 +175,7 @@ int main(int argc, char *args[])
 	if (glewInit() != GLEW_OK) Error("glewInit");
 
 	// Goes stuttery if we turn on vsync
-	int vsync = 0;
-	if (args[1] = "-v")
-		vsync = -1;
-	SDL_GL_SetSwapInterval(vsync);
+	SDL_GL_SetSwapInterval(0);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
@@ -197,7 +190,6 @@ int main(int argc, char *args[])
 
 	perfCountFreq = SDL_GetPerformanceFrequency();
 	uint64 lastCounter = GetWallClock();
-	uint64 lastCycleCount = _rdtsc();
 
 	GameMemory game_memory = { 0 };
 	game_memory.size = Megabytes(64);
@@ -318,17 +310,20 @@ int main(int argc, char *args[])
 		uint64 endCounter = GetWallClock();
 		float64 msPerFrame = 1000.0f * GetSecondsElapsed(lastCounter, endCounter);
 		lastCounter = endCounter;
+
+		// Debug Render
+		BeginRenderer(&render_context);
+
+		std::string s = "FRAMETIME " + std::to_string(msPerFrame);
+		RenderString(&render_context, 180.0f, 50.0f, s.c_str(), 0.0f);
+
+		EndRenderer();
+
 		SDL_GL_SwapWindow(window);
 		input.prev_keyboard_state = input.keyboard_state;
 		input.mb_left_prev = input.mb_left;
 		input.mb_right_prev = input.mb_right;
 		input.mb_middle_prev = input.mb_middle;
-		uint64 endCycleCount = _rdtsc();
-		uint64 cyclesElapsed = endCycleCount - lastCycleCount;
-		lastCycleCount = endCycleCount;
-
-		float64 mcpf = ((float64)cyclesElapsed / (1000.0f * 1000.0f));
-		SDL_Log("%0.2fms/f,    %0.2fmc/f\n", msPerFrame, mcpf);
 	}
 	UnloadContext(&render_context);
 	SDL_free(game_memory.memory);

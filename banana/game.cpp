@@ -111,21 +111,23 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			if (game->red == 1) game->red = 0;
 			else game->red = 1;
 
-			if (IsKeyPressed(input, SDL_SCANCODE_F2))
-				if (game->green == 1) game->green = 0;
-				else game->green = 1;
+		if (IsKeyPressed(input, SDL_SCANCODE_F2))
+			if (game->green == 1) game->green = 0;
+			else game->green = 1;
 
-				if (IsKeyPressed(input, SDL_SCANCODE_F3))
-					if (game->blue == 1) game->blue = 0;
-					else game->blue = 1;
 
-					if (game->camera_pos.x < 0) game->camera_pos.x = 0;
-					if (game->camera_pos.y < 0) game->camera_pos.y = 0;
-					if (game->camera_pos.x + 1920.0f / game->camera_scale > MAP_W*32.0f + 16.0f)
-						game->camera_pos.x = (MAP_W*32.0f + 16.0f) - 1920.0f / game->camera_scale;
-					if (game->camera_pos.y + 1080.0f / game->camera_scale > MAP_H*32.0f + 16.0f)
-						game->camera_pos.y = (MAP_H*32.0f + 16.0f) - 1080.0f / game->camera_scale;
+		if (IsKeyPressed(input, SDL_SCANCODE_F3))
+			if (game->blue == 1) game->blue = 0;
+			else game->blue = 1;
 
+		if (game->camera_pos.x < 0) game->camera_pos.x = 0;
+		if (game->camera_pos.y < 0) game->camera_pos.y = 0;
+		if (game->camera_pos.x + 1920.0f / game->camera_scale > MAP_W*32.0f + 16.0f)
+			game->camera_pos.x = (MAP_W*32.0f + 16.0f) - 1920.0f / game->camera_scale;
+		if (game->camera_pos.y + 1080.0f / game->camera_scale > MAP_H*32.0f + 16.0f)
+			game->camera_pos.y = (MAP_H*32.0f + 16.0f) - 1080.0f / game->camera_scale;
+		
+		
 	}
 	// Rendering
 	RenderClear(render_context, 32, 20, 41, 255);

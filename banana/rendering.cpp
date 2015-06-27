@@ -48,7 +48,7 @@ void InitializeContext(RenderContext *context)
 		1, GL_FALSE, &projection.data[0]);
 	glUseProgram(0);
 
-	context->font = LoadTexture("assets/font.png");
+	context->font = LoadTexture("assets/font.png", GL_LINEAR);
 
 }
 
@@ -155,7 +155,7 @@ void RenderTexture(RenderContext *context, float x, float y, float rotation, Tex
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void RenderString(RenderContext *context, float x, float y, char *text, float spacing)
+void RenderString(RenderContext *context, float x, float y, const char *text, float spacing)
 {
 	float char_width = context->font.height;
 	float char_height = context->font.height;

@@ -23,7 +23,7 @@ struct Texture
 	int height;
 };
 
-Texture LoadTexture(char *filename);
+Texture LoadTexture(char *filename, GLfloat blending = GL_NEAREST);
 void UnloadTexture(Texture *texture);
 
 #endif // GL_UTIL_H
