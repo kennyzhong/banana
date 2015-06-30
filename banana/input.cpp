@@ -1,25 +1,25 @@
 #include "input.h"
 
-bool IsKeyDown(InputData *input, SDL_Scancode key)
+bool IsKeyDown(InputData *input, const char *key)
 {
-	return input->keyboard_state[key];
+	return input->keyboard_state[SDL_GetScancodeFromName(key)];
 }
 
-bool IsKeyUp(InputData *input, SDL_Scancode key)
+bool IsKeyUp(InputData *input, const char *key)
 {
-	return !input->keyboard_state[key];
+	return !input->keyboard_state[SDL_GetScancodeFromName(key)];
 }
 
-bool IsKeyPressed(InputData *input, SDL_Scancode key)
+bool IsKeyPressed(InputData *input, const char *key)
 {
-	if (!input->prev_keyboard_state[key] && IsKeyDown(input, key))
+	if (!input->prev_keyboard_state[SDL_GetScancodeFromName(key)] && IsKeyDown(input, key))
 		return true;
 	return false;
 }
 
-bool IsKeyReleased(InputData *input, SDL_Scancode key)
+bool IsKeyReleased(InputData *input, const char *key)
 {
-	if (input->prev_keyboard_state[key] && IsKeyUp(input, key))
+	if (input->prev_keyboard_state[SDL_GetScancodeFromName(key)] && IsKeyUp(input, key))
 		return true;
 	return false;
 }

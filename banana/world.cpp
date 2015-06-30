@@ -98,22 +98,22 @@ void PlayerUpdate(World *world, uint32 entity, float delta, InputData *input)
 	Velocity *v = &world->velocities[entity];
 	Sprite *s = &world->sprites[entity];
 
-	if (IsKeyDown(input, SDL_SCANCODE_D))
+	if (IsKeyDown(input, "d"))
 	{
 		v->velocity.x += v->speed;
 		s->y_offset = 0.0f;
 	}
-	if (IsKeyDown(input, SDL_SCANCODE_A))
+	if (IsKeyDown(input, "a"))
 	{
 		v->velocity.x -= v->speed;
 		s->y_offset = 32.0f;
 	}
 
-	if (IsKeyDown(input, SDL_SCANCODE_W))
+	if (IsKeyDown(input, "w"))
 	{
 		v->velocity.y -= v->speed;
 	}
-	if (IsKeyDown(input, SDL_SCANCODE_S))
+	if (IsKeyDown(input, "s"))
 	{
 		v->velocity.y += v->speed;
 	}

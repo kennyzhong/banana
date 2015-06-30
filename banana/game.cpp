@@ -108,19 +108,19 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->camera_pos.x += ((game->camera_pos.x - target.x) * delta);
 		game->camera_pos.y += ((game->camera_pos.y - target.y) * delta);*/
 
-		if (IsKeyPressed(input, SDL_SCANCODE_F9))
+		if (IsKeyPressed(input, "f9"))
 			game->render_aabbs = !game->render_aabbs;
 
-		if (IsKeyPressed(input, SDL_SCANCODE_F1))
+		if (IsKeyPressed(input, "f1"))
 			if (game->red == 1) game->red = 0;
 			else game->red = 1;
 
-		if (IsKeyPressed(input, SDL_SCANCODE_F2))
+		if (IsKeyPressed(input, "f2"))
 			if (game->green == 1) game->green = 0;
 			else game->green = 1;
 
 
-		if (IsKeyPressed(input, SDL_SCANCODE_F3))
+		if (IsKeyPressed(input, "f3"))
 			if (game->blue == 1) game->blue = 0;
 			else game->blue = 1;
 

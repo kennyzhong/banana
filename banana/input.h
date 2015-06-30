@@ -22,10 +22,10 @@ struct InputData
 	bool mb_middle_prev;
 };
 
-bool IsKeyDown(InputData *input, SDL_Scancode key);
-bool IsKeyUp(InputData *input, SDL_Scancode key);
-bool IsKeyPressed(InputData *input, SDL_Scancode key);
-bool IsKeyReleased(InputData *input, SDL_Scancode key);
+bool IsKeyDown(InputData *input, const char *key);
+bool IsKeyUp(InputData *input, const char *key);
+bool IsKeyPressed(InputData *input, const char *key);
+bool IsKeyReleased(InputData *input, const char *key);
 
 enum MouseButton
 {
