@@ -33,6 +33,12 @@ struct GameState
 	float red;
 	float green;
 	float blue;
+
+
+	GLuint fbo;
+	GLuint depth_rb;
+	GLuint color_tex;
+
 	bool32 initialized;
 };
 

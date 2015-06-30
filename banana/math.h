@@ -61,6 +61,7 @@ Matrix4 Matrix4_rotate(float angle, float x, float y, float z);
 Matrix4 Matrix4_scale(float x, float y, float z);
 
 float ToDegrees(float radians);
+float ToRadians(float degrees);
 float Clamp(float input, float min, float max);
 
 #endif // MATH_H

@@ -13,11 +13,13 @@ struct RenderContext;
 struct World
 {
 	uint32 mask[ENTITY_COUNT];
+	uint32 owners[ENTITY_COUNT];
 	Transform transforms[ENTITY_COUNT];
 	Velocity velocities[ENTITY_COUNT];
 	Sprite sprites[ENTITY_COUNT];
 	ComAABB com_aabbs[ENTITY_COUNT];
-
+	Arrow arrows[ENTITY_COUNT];
+	
 	AABB aabbs[AABB_COUNT];
 };
 
@@ -32,9 +34,15 @@ void DestroyEntity(World *world, uint32 entity);
 bool HasComponent(World *world, uint32 index, uint32 mask);
 
 #define PLAYER_MASK (COMPONENT_TRANSFORM | COMPONENT_SPRITE | \
-					COMPONENT_VELOCITY | COMPONENT_AABB) 
+					COMPONENT_VELOCITY | COMPONENT_AABB | COMPONENT_PLAYER) 
 uint32 CreatePlayer(World *world, Vector2 position, Texture *entities);
+#define ARROW_MASK (COMPONENT_TRANSFORM | COMPONENT_SPRITE | \
+					COMPONENT_VELOCITY | COMPONENT_AABB | COMPONENT_ARROW) 
+uint32 CreateArrow(World *world, Vector2 position, Texture *entities, uint32 entity_owner);
+
 void PlayerUpdate(World *world, uint32 entity, float delta, InputData *input);
+void ArrowUpdate(World *world, uint32 entity, float delta, InputData *input);
+void TransformUpdate(World *world, uint32 entity);
 void VelocityUpdate(World *world, uint32 entity, float delta);
 void AABBUpdate(World *world, uint32 entity);
 

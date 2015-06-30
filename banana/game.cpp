@@ -91,10 +91,14 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		{
 			if (HasComponent(&game->world, entity, PLAYER_MASK))
 				PlayerUpdate(&game->world, entity, delta, input);
+			if (HasComponent(&game->world, entity, COMPONENT_ARROW))
+				ArrowUpdate(&game->world, entity, delta, input);
 			if (HasComponent(&game->world, entity, COMPONENT_VELOCITY | COMPONENT_TRANSFORM | COMPONENT_AABB))
 				VelocityUpdate(&game->world, entity, delta);
 			if (HasComponent(&game->world, entity, COMPONENT_TRANSFORM | COMPONENT_AABB))
 				AABBUpdate(&game->world, entity);
+			if (HasComponent(&game->world, entity, COMPONENT_TRANSFORM))
+				TransformUpdate(&game->world, entity);
 		}
 		/*
 		Vector2 position = game->world.transforms[game->player].position;
@@ -137,7 +141,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	glUniform3f(game->color_change_loc, game->red, game->green, game->blue);
 	
 	
-	for (int x = 0; x < MAP_W; ++x)
+	/*for (int x = 0; x < MAP_W; ++x)
 	{
 		for (int y = 0; y < MAP_H; ++y)
 		{
@@ -153,7 +157,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 				}
 			}
 		}
-	}
+	}*/
 
 	for (uint32 entity = 0; entity < ENTITY_COUNT; ++entity)
 	{
@@ -176,6 +180,6 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		}
 	}
 
-	EndRenderer();
-	
+
+	EndRenderer();	
 }

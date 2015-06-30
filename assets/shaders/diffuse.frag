@@ -21,5 +21,6 @@ void main()
 	final_color.r *= color_change.r;
 	final_color.g *= color_change.g;
 	final_color.b *= color_change.b;
+
 	gl_FragColor = final_color;
 }

@@ -206,6 +206,11 @@ float ToDegrees(float radians)
 	return tanf(radians*M_PI / 180.0f);
 }
 
+float ToRadians(float degrees)
+{
+	return ((180.0f * degrees) / M_PI);
+}
+
 float Clamp(float input, float  min, float max)
 {
 	if (input < min) return min;

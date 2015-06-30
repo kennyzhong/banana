@@ -72,9 +72,23 @@ uint32 CreatePlayer(World *world, Vector2 position, Texture *entities)
 	world->mask[entity] = PLAYER_MASK;
 	Vector2 dim(11.0f, 30.0f);
 	world->transforms[entity] = { position };
-	world->sprites[entity] = { entities, 0.0f, 0.0f, 32.0f, 32.0f};
+	world->sprites[entity] = { entities, 0.0f, 0.0f, 32.0f, 32.0f };
 	world->com_aabbs[entity].aabb = CreateAABB(world, position - (dim*0.5f), position + (dim*0.5f), AABB_PLAYER);
 	world->velocities[entity] = { Vector2(), 200.0f, 0.7f };
+	return entity;
+}
+
+uint32 CreateArrow(World *world, Vector2 position, Texture *entities, uint32 entity_owner)
+{
+	uint32 entity = CreateEntity(world);
+	world->mask[entity] = ARROW_MASK;
+	world->owners[entity] = entity_owner;
+	Vector2 dim(13.0f, 5.0f);
+	world->transforms[entity] = { position };
+	world->sprites[entity] = { entities, 0.0f, 64.0f, 16.0f, 16.0f };
+	world->com_aabbs[entity].aabb = CreateAABB(world, position - (dim*0.5f), position + (dim*0.5f), AABB_PLAYER);
+	world->velocities[entity] = { Vector2(), 200.0f, 0.7f };
+	world->arrows[entity] = { false };
 	return entity;
 }
 
@@ -84,24 +98,63 @@ void PlayerUpdate(World *world, uint32 entity, float delta, InputData *input)
 	Velocity *v = &world->velocities[entity];
 	Sprite *s = &world->sprites[entity];
 
-	if (IsKeyDown(input, SDL_SCANCODE_RIGHT))
+	if (IsKeyDown(input, SDL_SCANCODE_D))
 	{
 		v->velocity.x += v->speed;
 		s->y_offset = 0.0f;
 	}
-	if (IsKeyDown(input, SDL_SCANCODE_LEFT))
+	if (IsKeyDown(input, SDL_SCANCODE_A))
 	{
 		v->velocity.x -= v->speed;
 		s->y_offset = 32.0f;
 	}
 
-	if (IsKeyDown(input, SDL_SCANCODE_UP))
+	if (IsKeyDown(input, SDL_SCANCODE_W))
 	{
 		v->velocity.y -= v->speed;
 	}
-	if (IsKeyDown(input, SDL_SCANCODE_DOWN))
+	if (IsKeyDown(input, SDL_SCANCODE_S))
 	{
 		v->velocity.y += v->speed;
+	}
+
+	if (IsMousePressed(input, MB_LEFT))
+	{
+		CreateArrow(world, t->position, s->texture, entity);
+	}
+}
+
+void ArrowUpdate(World *world, uint32 entity, float delta, InputData *input)
+{
+	Transform *t = &world->transforms[entity];
+	Velocity *v = &world->velocities[entity];
+	Arrow *a = &world->arrows[entity];
+
+	if (!a->fired)
+		t->rotation = atan2f(input->mouse_pos.y - t->position.y, input->mouse_pos.x - t->position.y) * 180.0f / M_PI;
+
+	if (IsMouseReleased(input, MB_LEFT) && !a->fired)
+	{
+		a->fired = true;
+	}
+	if (IsMouseUp(input, MB_LEFT) && !a->fired)
+		DestroyEntity(world, entity);
+
+	if (a->fired)
+	{
+		v->velocity.x = (float)cosf(ToRadians(t->rotation)) * v->speed;
+		v->velocity.y = (float)sinf(ToRadians(t->rotation)) * v->speed;
+	}
+}
+
+void TransformUpdate(World *world, uint32 entity)
+{
+	Transform *t = &world->transforms[entity];
+	uint32 owner_id = world->owners[entity];
+	if (owner_id != 0)
+	{
+		Transform *t_owner = &world->transforms[owner_id];
+		t->position = t_owner->position + t->position;
 	}
 }
 

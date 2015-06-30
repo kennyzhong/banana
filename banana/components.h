@@ -26,7 +26,8 @@ enum Components
 	COMPONENT_VELOCITY = 1 << 1,
 	COMPONENT_SPRITE = 1 << 2,
 	COMPONENT_PLAYER = 1 << 3,
-	COMPONENT_AABB = 1 << 4
+	COMPONENT_AABB = 1 << 4,
+	COMPONENT_ARROW = 1 << 5
 };
 
 struct Transform
@@ -39,6 +40,11 @@ struct Transform
 struct ComAABB
 {
 	AABB *aabb;
+};
+
+struct Arrow
+{
+	bool fired;
 };
 
 struct Velocity
