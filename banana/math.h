@@ -29,9 +29,40 @@ struct Vector2
 
 	void operator*=(float f);
 	void operator/=(float f);
-
-
 };
+
+struct Vector3
+{
+	Vector3(float x, float y, float z) : x(x), y(y) , z(z){};
+	Vector3() : x(0.0f), y(0.0f), z(0.0f) {};
+	Vector3(Vector2 i) : x(i.x), y(i.y), z(0.0f){};
+
+	float x;
+	float y;
+	float z;
+
+	Vector3 operator+(const Vector3 &other);
+	Vector3 operator-(const Vector3 &other);
+
+	bool operator<(const Vector3 &other);
+	bool operator>(const Vector3 &other);
+
+	bool operator<=(const Vector3 &other);
+	bool operator>=(const Vector3 &other);
+
+	bool operator!=(const Vector3 &other);
+	bool operator==(const Vector3 &other);
+
+	void operator+=(const Vector3 &other);
+	void operator-=(const Vector3 &other);
+
+	Vector3 operator*(float f);
+	Vector3 operator/(float f);
+
+	void operator*=(float f);
+	void operator/=(float f);
+};
+
 
 #ifndef M_PI
 #    define M_PI 3.14159265358979323846f

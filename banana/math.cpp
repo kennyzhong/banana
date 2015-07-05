@@ -98,6 +98,114 @@ bool Vector2::operator!=(const Vector2 &other)
 	return false;
 }
 
+// Vector3
+
+Vector3 Vector3::operator+(const Vector3 &other)
+{
+	Vector3 result;
+	result.x = other.x + x;
+	result.y = other.y + y;
+	result.z = other.z + z;
+	return result;
+}
+
+Vector3 Vector3::operator-(const Vector3 &other)
+{
+	Vector3 result;
+	result.x = x - other.x;
+	result.y = y - other.y;
+	result.z = z - other.z;
+	return result;
+}
+
+void Vector3::operator+=(const Vector3 &other)
+{
+	x += other.x;
+	y += other.y;
+	z += other.z;
+}
+
+void Vector3::operator-=(const Vector3 &other)
+{
+	x -= other.x;
+	y -= other.y;
+	z -= other.z;
+}
+
+Vector3 Vector3::operator*(float f)
+{
+	Vector3 result;
+	result.x = x * f;
+	result.y = y * f;
+	result.z = z * f;
+	return result;
+}
+
+Vector3 Vector3::operator/(float f)
+{
+	Vector3 result;
+	result.x = x / f;
+	result.y = y / f;
+	result.z = z / f;
+	return result;
+}
+
+void Vector3::operator*=(float f)
+{
+	x *= f;
+	y *= f;
+	z *= f;
+}
+void Vector3::operator/=(float f)
+{
+	x /= f;
+	y /= f;
+	z /= f;
+}
+
+bool Vector3::operator<(const Vector3 &other)
+{
+	if (x < other.x && y < other.y && z < other.z)
+		return true;
+	return false;
+}
+
+bool Vector3::operator>(const Vector3 &other)
+{
+	if (x > other.x && y > other.y && z > other.z)
+		return true;
+	return false;
+}
+
+bool Vector3::operator<=(const Vector3 &other)
+{
+	if (x <= other.x && y <= other.y && z <= other.z)
+		return true;
+	return false;
+}
+
+bool Vector3::operator>=(const Vector3 &other)
+{
+	if (x >= other.x && y >= other.y && z >= other.z)
+		return true;
+	return false;
+}
+
+bool Vector3::operator==(const Vector3 &other)
+{
+	if (x == other.x && y == other.y && z == other.z)
+		return true;
+	return false;
+}
+
+bool Vector3::operator!=(const Vector3 &other)
+{
+	if (x != other.x || y != other.y || z != other.z)
+		return true;
+	return false;
+}
+
+
 Matrix4 Matrix4::operator*(const Matrix4 &m2)
 {
 	Matrix4 m = { 0 };
