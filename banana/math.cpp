@@ -272,6 +272,29 @@ Matrix4 Matrix4_translate(float x, float y, float z)
 	return result;
 }
 
+Matrix4 Matrix4_perspective(float fovy, float aspect, float znear, float zfar)
+{
+	Matrix4 result = { 0 }; 
+	float h, w;
+	h = (float)tanf(fovy / 360.0f * M_PI) * znear;
+	w = h * aspect;
+	result = Matrix4_frustum(-w, w, -h, h, znear, zfar);
+	return result;
+}
+
+Matrix4 Matrix4_frustum(float left, float right, float bottom, float top, float znear, float zfar)
+{
+	Matrix4 result = { 0 };
+	result.m00 = (2.0f * znear) / (right - left);
+	result.m20 = (right + left) / (right - left);
+	result.m11 = (2.0f*znear) / (top - bottom);
+	result.m21 = (top + bottom) / (top - bottom);
+	result.m22 = -(zfar + znear) / (zfar - znear);
+	result.m32 = -(2.0f*zfar*znear) / (zfar - znear);
+	result.m23 = -1.0f;
+	return result;
+}
+
 Matrix4 Matrix4_rotate(float angle, float x, float y, float z)
 {
 	float c, s, norm;

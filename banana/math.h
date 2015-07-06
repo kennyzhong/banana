@@ -87,6 +87,8 @@ struct Matrix4
 
 Matrix4 Matrix4_identity();
 Matrix4 Matrix4_ortho(float left, float right, float top, float bottom, float znear, float zfar);
+Matrix4 Matrix4_frustum(float left, float right, float bottom, float top, float znear, float zfar);
+Matrix4 Matrix4_perspective(float fovy, float aspect, float znear, float zfar);
 Matrix4 Matrix4_translate(float x, float y, float z);
 Matrix4 Matrix4_rotate(float angle, float x, float y, float z);
 Matrix4 Matrix4_scale(float x, float y, float z);
