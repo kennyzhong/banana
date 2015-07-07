@@ -1,6 +1,7 @@
 #include <ctime>
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include "game.h"
 #include "input.h"
 #include "rendering.h"
@@ -14,6 +15,9 @@ internal Vector2 GetTileFromID(int id, Texture *texture, float tile_size)
 	return pos;
 }
 
+global_variable int instance_num = 0;
+global_variable GLuint world_vbo, world_vao, world_ebo, world_tbo, world_tobo;
+
 void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContext *render_context,
 	bool &paused, float delta)
 {
@@ -23,6 +27,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		// Initailzation
 		game->sheet = LoadTexture("assets/sheet.png");
 		game->entities = LoadTexture("assets/entities.png");
+		game->tile = LoadTexture("assets/player.png");
 
 		using namespace tinyxml2;
 		XMLDocument doc;
@@ -81,6 +86,102 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->red = 1.0f;
 		game->green = 1.0f;
 		game->blue = 1.0f;
+
+		game->world_shader = CreateShader("assets/shaders/world.vert", "assets/shaders/world.frag");
+
+		std::vector<Matrix4> transforms;
+		std::vector<Matrix4> tex_offsets;
+		for (int x = 0; x < MAP_W; x++)
+		{
+			for (int y = 0; y < MAP_H; y++)
+			{
+				if (game->map[y][x] > 0)
+				{
+					Vector2 pos(16.0f + (x * 32.0f), 16.0f + (y * 32.0f));
+					Vector2 tile = GetTileFromID(game->map[y][x], &game->sheet, 32);
+					//RenderTexture(render_context, pos.x, pos.y, 0.0f, &game->sheet, tile.x, tile.y, 32.0f, 32.0f);
+					float scale_x = 32.0f / (float)game->sheet.width;
+					float scale_y = 32.0f / (float)game->sheet.height;
+					Matrix4 tex_offset = Matrix4_scale(scale_x, scale_y, 1.0f) *
+						Matrix4_translate(
+						(1.0f / (float)game->sheet.width)*tile.x,
+						(1.0f / (float)game->sheet.height)*tile.y, 0.0f);
+					transforms.push_back(Matrix4_scale(32.0f, 32.0f, 1.0f) * 
+						Matrix4_translate(pos.x, pos.y, 0.0f));
+					tex_offsets.push_back(tex_offset);
+					
+				}
+			}
+		}
+		instance_num = (int)transforms.size();
+		
+
+		float v = 0.5f;
+
+		Vector2 vertices[] =
+		{
+			Vector2(-v, v), Vector2(0.0f, 1.0f),
+			Vector2(v, v), Vector2(1.0f, 1.0f),
+			Vector2(v, -v), Vector2(1.0f, 0.0f),
+			Vector2(-v, -v), Vector2(0.0f,  0.0f)
+		};
+
+		glGenVertexArrays(1, &world_vao);
+		glBindVertexArray(world_vao);
+
+		glGenBuffers(1, &world_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, world_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(Vector2), vertices, GL_STATIC_DRAW);
+
+		GLint pos = glGetAttribLocation(game->world_shader.program, "position");
+		glEnableVertexAttribArray(pos);
+		glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(Vector2), 0);
+
+		GLint tex = glGetAttribLocation(game->world_shader.program, "tex_coord");
+		glVertexAttribPointer(tex, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(Vector2), 
+			(const GLvoid *)(sizeof(Vector2)));
+
+		glGenBuffers(1, &world_tbo);
+		glBindBuffer(GL_ARRAY_BUFFER, world_tbo);
+		glBufferData(GL_ARRAY_BUFFER, transforms.size() * sizeof(Matrix4), &transforms.front(), GL_STATIC_DRAW);
+
+		GLint t = glGetAttribLocation(game->world_shader.program, "world");
+		for (uint32 i = 0; i < 4; i++)
+		{
+			glVertexAttribPointer(t + i, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4),
+				(void*)(sizeof(float) * i * 4));
+			glEnableVertexAttribArray(t + i);
+			glVertexAttribDivisor(t + i, 1);
+		}
+
+		glGenBuffers(1, &world_tobo);
+		glBindBuffer(GL_ARRAY_BUFFER, world_tobo);
+		glBufferData(GL_ARRAY_BUFFER, tex_offsets.size() * sizeof(Matrix4), &tex_offsets.front(), GL_STATIC_DRAW);
+
+		GLint to = glGetAttribLocation(game->world_shader.program, "tex_offset");
+		for (uint32 i = 0; i < 4; i++)
+		{
+			glVertexAttribPointer(to + i, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4),
+				(void*)(sizeof(float) * i * 4));
+			glEnableVertexAttribArray(to + i);
+			glVertexAttribDivisor(to + i, 1);
+		}
+
+		GLuint elements[] =
+		{
+			0, 1, 2,
+			0, 2, 3
+		};
+
+		glGenBuffers(1, &world_ebo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
+		BindShader(&game->world_shader);
+		Matrix4 projection = Matrix4_ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(game->world_shader.program, "projection"),
+			1, GL_FALSE, &projection.data[0]);
+		glUseProgram(0);
 	}
 
 	// Update
@@ -135,6 +236,17 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	}
 	// Rendering
 	RenderClear(render_context, 32, 20, 41, 255);
+
+	BindShader(&game->world_shader);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, game->sheet.id);
+	glBindVertexArray(world_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, world_vbo);
+	glGenBuffers(1, &world_tbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ebo);
+	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, instance_num);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUseProgram(0);
 
 	BeginRenderer(render_context, Matrix4_scale(game->camera_scale, game->camera_scale, 1.0f) *
 		Matrix4_translate(-game->camera_pos.x, -game->camera_pos.y, 0.0f));

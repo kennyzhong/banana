@@ -27,17 +27,14 @@ struct GameState
 	World world;
 	Texture sheet;
 	Texture entities;
+	Texture tile;
 	bool render_aabbs = false;
 	uint32 player;
 	GLint color_change_loc;
 	float red;
 	float green;
 	float blue;
-
-
-	GLuint fbo;
-	GLuint depth_rb;
-	GLuint color_tex;
+	Shader world_shader;
 
 	bool32 initialized;
 };

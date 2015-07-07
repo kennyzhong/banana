@@ -127,6 +127,12 @@ enum Mode
 	MODE_EDITOR
 };
 
+struct AssetMemory
+{
+	void *memory;
+	uint32 size;
+};
+
 int main(int argc, char *args[])
 {
 #if _WIN32
