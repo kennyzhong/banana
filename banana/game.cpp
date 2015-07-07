@@ -35,7 +35,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		XMLElement *map = doc.FirstChildElement("map");
 		XMLElement *tile_layer = map->FirstChildElement("layer");
 		XMLElement *data = tile_layer->FirstChildElement("data");
-		XMLElement *collisions = tile_layer->NextSiblingElement("objectgroup");
+		XMLElement *collisions = map->FirstChildElement("objectgroup");
 		
 		XMLElement *obj1 = collisions->FirstChildElement();
 		while (obj1 != 0)
