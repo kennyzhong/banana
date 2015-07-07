@@ -138,6 +138,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(Vector2), 0);
 
 		GLint tex = glGetAttribLocation(game->world_shader.program, "tex_coord");
+		glEnableVertexAttribArray(tex);
 		glVertexAttribPointer(tex, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(Vector2), 
 			(const GLvoid *)(sizeof(Vector2)));
 
