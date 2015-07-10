@@ -18,6 +18,9 @@ internal Vector2 GetTileFromID(int id, Texture *texture, float tile_size)
 global_variable int instance_num = 0;
 global_variable GLuint world_vbo, world_vao, world_ebo, world_tbo, world_tobo;
 
+global_variable GLuint fbo, fto;
+global_variable Texture fbt;
+
 void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContext *render_context,
 	bool &paused, float delta)
 {
@@ -79,7 +82,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->camera_pos = Vector2(0.0f, 0.0f);
 		game->camera_scale = 1.0f;
 
-		game->player = CreatePlayer(&game->world, Vector2(100.0f, 100.0f), &game->entities);
+		game->player = CreatePlayer(&game->world, Vector2(800.0f, 600.0f), &game->entities);
 		game->color_change_loc = glGetUniformLocation(render_context->diffuse.program, "color_change");
 		game->initialized = true;
 
@@ -183,6 +186,25 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		glUniformMatrix4fv(glGetUniformLocation(game->world_shader.program, "projection"),
 			1, GL_FALSE, &projection.data[0]);
 		glUseProgram(0);
+
+		// FBO stuff
+		glGenFramebuffers(1, &fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glGenTextures(1, &fto);
+		glBindTexture(GL_TEXTURE_2D, fto);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 360, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fto, 0);
+		GLenum draw_buffers[1] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers(1, draw_buffers);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			Error("Framebuffer error", true);
+
+		fbt.width = 640;
+		fbt.height = 360;
+		fbt.id = fto;
 	}
 
 	// Update
@@ -237,6 +259,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	}
 	// Rendering
 	RenderClear(render_context, 32, 20, 41, 255);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	BindShader(&game->world_shader);
 	glActiveTexture(GL_TEXTURE0);
@@ -294,5 +317,10 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	}
 
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	RenderTexture(render_context, 1920.0f*0.5f, 1080.0f*0.5f, 0.0f, &fbt, 0.0f, 0.0f, 640, 360,
+		255, 170, 60, 255);
 	EndRenderer();	
+
+
 }
