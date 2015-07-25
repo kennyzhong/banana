@@ -170,6 +170,7 @@
     <ClCompile Include="rendering.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="ui.cpp" />
+    <ClCompile Include="voxels.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +186,7 @@
     <ClInclude Include="std.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="ui.h" />
+    <ClInclude Include="voxels.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

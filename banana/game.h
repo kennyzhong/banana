@@ -8,6 +8,7 @@
 
 struct InputData;
 struct RenderContext;
+struct VoxelRenderContext;
 
 struct GameMemory
 {
@@ -37,10 +38,13 @@ struct GameState
 	Shader world_shader;
 	Texture paul;
 
+	Vector3 camera3d_pos;
+	Vector3 camera3d_rot;
+
 	bool32 initialized;
 };
 
-void GameUpdateAndRender(GameMemory *game_memory, InputData *input, 
-	RenderContext *render_context, bool &paused, float delta);
+void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContext *render_context,
+	VoxelRenderContext *voxel_render_context, bool &paused, float delta);
 
 #endif // GAME_H

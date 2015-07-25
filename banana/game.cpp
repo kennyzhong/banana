@@ -5,6 +5,7 @@
 #include "game.h"
 #include "input.h"
 #include "rendering.h"
+#include "voxels.h"
 #include "tinyxml2.h"
 
 internal Vector2 GetTileFromID(int id, Texture *texture, float tile_size)
@@ -18,9 +19,10 @@ internal Vector2 GetTileFromID(int id, Texture *texture, float tile_size)
 global_variable int instance_num = 0;
 global_variable GLuint world_vbo, world_vao, world_ebo, world_tbo, world_tobo;
 
+global_variable float rot = 0.0f;
 
 void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContext *render_context,
-	bool &paused, float delta)
+	VoxelRenderContext *voxel_render_context, bool &paused, float delta)
 {
 	GameState *game = (GameState *)game_memory->memory;
 	if (!game->initialized)
@@ -88,6 +90,9 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->red = 1.0f;
 		game->green = 1.0f;
 		game->blue = 1.0f;
+
+		game->camera3d_pos = Vector3(0.0f, 0.0f, -5.0f);
+		game->camera3d_rot = Vector3(0.0f, 0.0f, 0.0f);
 
 		game->world_shader = CreateShader("assets/shaders/world.vert", "assets/shaders/world.frag");
 
@@ -211,7 +216,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	if (!paused)
 	{
 		game->time += delta;
-		for (uint32 entity = 0; entity < ENTITY_COUNT; ++entity)
+		/*for (uint32 entity = 0; entity < ENTITY_COUNT; ++entity)
 		{
 			if (HasComponent(&game->world, entity, PLAYER_MASK))
 				PlayerUpdate(&game->world, entity, delta, input);
@@ -226,11 +231,11 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		}
 		
 		Vector2 position = game->world.transforms[game->player].position;
-		Vector2 target;
+		Vector2 target;*/
 		//game->camera_pos.x = position.x - (1920.0f / game->camera_scale)*0.5f;
 		//game->camera_pos.y = position.y - (1080.0f / game->camera_scale)*0.5f;
-		game->camera_pos.x = position.x - 300.0f;
-		game->camera_pos.y = position.y - 300.0f;
+		/*game->camera_pos.x = position.x - 300.0f;
+		game->camera_pos.y = position.y - 300.0f;*/
 		//target.x;
 		//target.y;
 		//game->camera_pos.x += ((target.x - game->camera_pos.x) * 100 * delta);
@@ -240,17 +245,41 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			game->render_aabbs = !game->render_aabbs;
 
 		if (IsKeyPressed(input, "f1"))
+		{
 			if (game->red == 1) game->red = 0;
 			else game->red = 1;
+		}
 
 		if (IsKeyPressed(input, "f2"))
+		{
 			if (game->green == 1) game->green = 0;
 			else game->green = 1;
+		}
 
 
 		if (IsKeyPressed(input, "f3"))
+		{
 			if (game->blue == 1) game->blue = 0;
 			else game->blue = 1;
+		}
+
+		if (IsKeyDown(input, "w"))
+			game->camera3d_pos.z += 10 * delta;
+		if (IsKeyDown(input, "s"))
+			game->camera3d_pos.z -= 10 * delta;
+		if (IsKeyDown(input, "a"))
+			game->camera3d_pos.x += 10 * delta;
+		if (IsKeyDown(input, "d"))
+			game->camera3d_pos.x -= 10 * delta;
+
+		if (IsKeyDown(input, "right"))
+			game->camera3d_rot.y += 20 * delta;
+		if (IsKeyDown(input, "left"))
+			game->camera3d_rot.y -= 20 * delta;
+		if (IsKeyDown(input, "up"))
+			game->camera3d_rot.x += 20 * delta;
+		if (IsKeyDown(input, "down"))
+			game->camera3d_rot.x -= 20 * delta;
 
 		/*if (game->camera_pos.x < 0) game->camera_pos.x = 0;
 		if (game->camera_pos.y < 0) game->camera_pos.y = 0;
@@ -258,10 +287,26 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			game->camera_pos.x = (MAP_W*32.0f + 16.0f) - 1920.0f / game->camera_scale;
 		if (game->camera_pos.y + 1080.0f / game->camera_scale > MAP_H*32.0f + 16.0f)
 			game->camera_pos.y = (MAP_H*32.0f + 16.0f) - 1080.0f / game->camera_scale;*/
+
+			//rot += 10.0f * delta;
 	}
 	// Rendering
-	RenderClear(render_context, 32, 20, 41, 255);
-	
+	RenderClear(render_context, 32, 20, 41, 255, GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	//glPolygonMode(GL_FRONT, GL_LINE);
+	//glPolygonMode(GL_BACK, GL_LINE);
+
+	BeginVoxelRenderer(voxel_render_context, 
+		Matrix4_translate(game->camera3d_pos.x, game->camera3d_pos.y, game->camera3d_pos.z));
+	RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), 
+		game->camera3d_rot, 255, 0, 0, 255, false);
+	EndVoxelRenderer();
+
+	//glPolygonMode(GL_FRONT, GL_FILL);
+	//glPolygonMode(GL_BACK, GL_FILL);
+	glDisable(GL_DEPTH_TEST);
+
 	//Matrix4 camera_matrix = Matrix4_scale(game->camera_scale, game->camera_scale, 1.0f) *
 	//	Matrix4_translate(-game->camera_pos.x, -game->camera_pos.y, 0.0f);
 
@@ -323,11 +368,9 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	//RenderSquare(render_context, game->camera_pos.x, game->camera_pos.y, 32.0f, 32.0f, 255, 255, 170, 255);
 	//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	//BeginRenderer(render_context);
-	//RenderTexture(render_context, 0.0f, 0.0f, &game->paul);
+	//RenderTexture(render_context, 700.0f, 700.0f, &game->paul);
 
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	//RenderTexture(render_context, 1920.0f*0.5f, 1080.0f*0.5f, &fbt);
 	//EndRenderer();	
-
-
 }

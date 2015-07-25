@@ -7,6 +7,7 @@
 #include "rendering.h"
 #include "editor.h"
 #include "ui.h"
+#include "voxels.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -186,7 +187,7 @@ int main(int argc, char *args[])
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(1.0f, 1.0f, 0.6f, 0.0f);
 
 	bool running = true;
 	SDL_Event e;
@@ -208,6 +209,10 @@ int main(int argc, char *args[])
 	RenderContext render_context = {};
 	render_context.diffuse = CreateShader("assets/shaders/diffuse.vert", "assets/shaders/diffuse.frag");
 	InitializeContext(&render_context);
+
+	VoxelRenderContext voxel_render_context = {};
+	voxel_render_context.diffuse = CreateShader("assets/shaders/voxels.vert", "assets/shaders/voxels.frag");
+	InitializeVoxelContext(&voxel_render_context);
 
 	InputData input = { };
 
@@ -288,7 +293,7 @@ int main(int argc, char *args[])
 
 		float32 delta = 1.0f / (float32)gameUpdateHz;
 
-		GameUpdateAndRender(&game_memory, &input, &render_context, game_paused, delta);
+		GameUpdateAndRender(&game_memory, &input, &render_context, &voxel_render_context, game_paused, delta);
 
 		uint64 workCounter = GetWallClock();
 		float32 workSecondsElapsed = GetSecondsElapsed(lastCounter, workCounter);
@@ -331,6 +336,7 @@ int main(int argc, char *args[])
 		input.mb_middle_prev = input.mb_middle;
 	}
 	UnloadContext(&render_context);
+	UnloadVoxelContext(&voxel_render_context);
 	SDL_free(game_memory.memory);
 
 	SDL_GL_DeleteContext(glContext);

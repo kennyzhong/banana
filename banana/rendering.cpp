@@ -61,9 +61,9 @@ void UnloadContext(RenderContext *context)
 	UnloadTexture(&context->font);
 }
 
-void RenderClear(RenderContext *context, uint8 r, uint8 g, uint8 b, uint8 a)
+void RenderClear(RenderContext *context, uint8 r, uint8 g, uint8 b, uint8 a, GLbitfield mask)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|mask);
 
 	BeginRenderer(context);
 	// Background letterbox thingy
