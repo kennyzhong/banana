@@ -11,7 +11,7 @@ uniform mat4 camera;
 
 void main()
 {
-	gl_Position = projection * world * vec4(position, 0.0, 1.0);
+	gl_Position = projection * camera * world * vec4(position, 0.0, 1.0);
 	tex_coord0 = tex_coord;
 	tex_offset0 = tex_offset;
 }

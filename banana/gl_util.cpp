@@ -124,3 +124,38 @@ void UnloadTexture(Texture *texture)
 {
 	glDeleteTextures(1, &texture->id);
 }
+
+#include "math.h"
+
+void InitializeInstancedMap(InstancedMap *map, const void *transforms, const void *tex_offsets,
+	Shader *shader, int instance_num)
+{
+	map->transforms = transforms;
+	map->tex_offsets = tex_offsets;
+	map->instance_num = instance_num;
+	map->shader = shader;
+	float v = 0.5f;
+	Vector2 vertices[] =
+	{
+		Vector2(-v, v), Vector2(0.0f, 1.0f),
+		Vector2(v, v), Vector2(1.0f, 1.0f),
+		Vector2(v, -v), Vector2(1.0f, 0.0f),
+		Vector2(-v, -v), Vector2(0.0f, 0.0f)
+	};
+
+	glGenVertexArrays(1, &map->vao);
+	glBindVertexArray(map->vao);
+}
+
+void RenderInstancedMap(InstancedMap *map, Texture *texture, Matrix4 transform)
+{
+	BindShader(map->shader);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture->id);
+	glBindVertexArray(map->vao);
+	glBindBuffer(GL_ARRAY_BUFFER, map->vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, map->ebo);
+	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, map->instance_num);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUseProgram(0);
+}

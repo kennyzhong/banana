@@ -35,6 +35,7 @@ struct GameState
 	float green;
 	float blue;
 	Shader world_shader;
+	Texture paul;
 
 	bool32 initialized;
 };

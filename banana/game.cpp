@@ -18,8 +18,6 @@ internal Vector2 GetTileFromID(int id, Texture *texture, float tile_size)
 global_variable int instance_num = 0;
 global_variable GLuint world_vbo, world_vao, world_ebo, world_tbo, world_tobo;
 
-global_variable GLuint fbo, fto;
-global_variable Texture fbt;
 
 void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContext *render_context,
 	bool &paused, float delta)
@@ -31,6 +29,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->sheet = LoadTexture("assets/sheet.png");
 		game->entities = LoadTexture("assets/entities.png");
 		game->tile = LoadTexture("assets/player.png");
+		game->paul = LoadTexture("assets/paul.png");
 
 		using namespace tinyxml2;
 		XMLDocument doc;
@@ -80,9 +79,9 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			game->world.aabbs[i].max.x, game->world.aabbs[i].max.y);
 
 		game->camera_pos = Vector2(0.0f, 0.0f);
-		game->camera_scale = 1.0f;
+		game->camera_scale = 2.6f;
 
-		game->player = CreatePlayer(&game->world, Vector2(800.0f, 600.0f), &game->entities);
+		game->player = CreatePlayer(&game->world, Vector2(96.0f, 96.0f), &game->entities);
 		game->color_change_loc = glGetUniformLocation(render_context->diffuse.program, "color_change");
 		game->initialized = true;
 
@@ -94,6 +93,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 
 		std::vector<Matrix4> transforms;
 		std::vector<Matrix4> tex_offsets;
+
 		for (int x = 0; x < MAP_W; x++)
 		{
 			for (int y = 0; y < MAP_H; y++)
@@ -188,13 +188,13 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		glUseProgram(0);
 
 		// FBO stuff
-		glGenFramebuffers(1, &fbo);
+		/*glGenFramebuffers(1, &fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glGenTextures(1, &fto);
 		glBindTexture(GL_TEXTURE_2D, fto);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 360, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fto, 0);
 		GLenum draw_buffers[1] = { GL_COLOR_ATTACHMENT0 };
@@ -202,9 +202,9 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			Error("Framebuffer error", true);
 
-		fbt.width = 640;
-		fbt.height = 360;
-		fbt.id = fto;
+		fbt.width = 1920;
+		fbt.height = 1080;
+		fbt.id = fto;*/
 	}
 
 	// Update
@@ -224,13 +224,17 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			if (HasComponent(&game->world, entity, COMPONENT_TRANSFORM))
 				TransformUpdate(&game->world, entity);
 		}
-		/*
+		
 		Vector2 position = game->world.transforms[game->player].position;
 		Vector2 target;
-		target.x = position.x - (1920.0f / game->camera_scale)*0.5f;
-		target.y = position.y - (1080.0f / game->camera_scale)*0.5f;
-		game->camera_pos.x += ((game->camera_pos.x - target.x) * delta);
-		game->camera_pos.y += ((game->camera_pos.y - target.y) * delta);*/
+		//game->camera_pos.x = position.x - (1920.0f / game->camera_scale)*0.5f;
+		//game->camera_pos.y = position.y - (1080.0f / game->camera_scale)*0.5f;
+		game->camera_pos.x = position.x - 300.0f;
+		game->camera_pos.y = position.y - 300.0f;
+		//target.x;
+		//target.y;
+		//game->camera_pos.x += ((target.x - game->camera_pos.x) * 100 * delta);
+		//game->camera_pos.y += ((target.y - game->camera_pos.y) * 100 * delta);
 
 		if (IsKeyPressed(input, "f9"))
 			game->render_aabbs = !game->render_aabbs;
@@ -248,79 +252,82 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			if (game->blue == 1) game->blue = 0;
 			else game->blue = 1;
 
-		if (game->camera_pos.x < 0) game->camera_pos.x = 0;
+		/*if (game->camera_pos.x < 0) game->camera_pos.x = 0;
 		if (game->camera_pos.y < 0) game->camera_pos.y = 0;
 		if (game->camera_pos.x + 1920.0f / game->camera_scale > MAP_W*32.0f + 16.0f)
 			game->camera_pos.x = (MAP_W*32.0f + 16.0f) - 1920.0f / game->camera_scale;
 		if (game->camera_pos.y + 1080.0f / game->camera_scale > MAP_H*32.0f + 16.0f)
-			game->camera_pos.y = (MAP_H*32.0f + 16.0f) - 1080.0f / game->camera_scale;
-		
-		
+			game->camera_pos.y = (MAP_H*32.0f + 16.0f) - 1080.0f / game->camera_scale;*/
 	}
 	// Rendering
 	RenderClear(render_context, 32, 20, 41, 255);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-	BindShader(&game->world_shader);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, game->sheet.id);
-	glBindVertexArray(world_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, world_vbo);
-	glGenBuffers(1, &world_tbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ebo);
-	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, instance_num);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glUseProgram(0);
-
-	BeginRenderer(render_context, Matrix4_scale(game->camera_scale, game->camera_scale, 1.0f) *
-		Matrix4_translate(-game->camera_pos.x, -game->camera_pos.y, 0.0f));
-	glUniform3f(game->color_change_loc, game->red, game->green, game->blue);
 	
-	
-	/*for (int x = 0; x < MAP_W; ++x)
-	{
-		for (int y = 0; y < MAP_H; ++y)
-		{
-			if (game->map[y][x] > 0)
-			{
-				Vector2 dim(1920.0f + 16.0f*game->camera_scale, 1080.0f + 16.0f*game->camera_scale);
-				Vector2 pos(16.0f + (x * 32.0f), 16.0f + (y * 32.0f));
-				if (pos * game->camera_scale >= game->camera_pos - Vector2(16.0f*game->camera_scale, 16.0f*game->camera_scale) &&
-					pos * game->camera_scale <= game->camera_pos + dim)
-				{
-					Vector2 tile = GetTileFromID(game->map[y][x], &game->sheet, 32);
-					RenderTexture(render_context, pos.x, pos.y, 0.0f, &game->sheet, tile.x, tile.y, 32.0f, 32.0f);
-				}
-			}
-		}
-	}*/
+	//Matrix4 camera_matrix = Matrix4_scale(game->camera_scale, game->camera_scale, 1.0f) *
+	//	Matrix4_translate(-game->camera_pos.x, -game->camera_pos.y, 0.0f);
 
-	for (uint32 entity = 0; entity < ENTITY_COUNT; ++entity)
-	{
-		if (HasComponent(&game->world, entity, COMPONENT_SPRITE))
-			SpriteRender(&game->world, entity, render_context);
-	}
-	
-	if (game->render_aabbs)
-	{
-		for (int i = 0; i < AABB_COUNT; ++i)
-		{
-			if (game->world.aabbs[i].mask != AABB_NONE)
-			{
-				float width = game->world.aabbs[i].max.x - game->world.aabbs[i].min.x;
-				float height = game->world.aabbs[i].max.y - game->world.aabbs[i].min.y;
-				float x = game->world.aabbs[i].min.x + width*0.5f;
-				float y = game->world.aabbs[i].min.y + height*0.5f;
-				RenderSquare(render_context, x, y, width, height, 0.0f, 255, 0, 0, 150, true);
-			}
-		}
-	}
+	//BindShader(&game->world_shader);
+	//glUniformMatrix4fv(glGetUniformLocation(game->world_shader.program, "camera"), 
+	//	GL_FLOAT, GL_FALSE, &camera_matrix.data[0]);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, game->sheet.id);
+	//glBindVertexArray(world_vao);
+	//glBindBuffer(GL_ARRAY_BUFFER, world_vbo);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ebo);
+	//glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, instance_num);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	//glUseProgram(0);
 
+	//BeginRenderer(render_context, camera_matrix);
+	//glUniform3f(game->color_change_loc, game->red, game->green, game->blue);
+	//
+	//
+	///*for (int x = 0; x < MAP_W; ++x)
+	//{
+	//	for (int y = 0; y < MAP_H; ++y)
+	//	{
+	//		if (game->map[y][x] > 0)
+	//		{
+	//			Vector2 dim(1920.0f + 16.0f*game->camera_scale, 1080.0f + 16.0f*game->camera_scale);
+	//			Vector2 pos(16.0f + (x * 32.0f), 16.0f + (y * 32.0f));
+	//			if (pos * game->camera_scale >= game->camera_pos - Vector2(16.0f*game->camera_scale, 16.0f*game->camera_scale) &&
+	//				pos * game->camera_scale <= game->camera_pos + dim)
+	//			{
+	//				Vector2 tile = GetTileFromID(game->map[y][x], &game->sheet, 32);
+	//				RenderTexture(render_context, pos.x, pos.y, 0.0f, &game->sheet, tile.x, tile.y, 32.0f, 32.0f);
+	//			}
+	//		}
+	//	}
+	//}*/
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	RenderTexture(render_context, 1920.0f*0.5f, 1080.0f*0.5f, 0.0f, &fbt, 0.0f, 0.0f, 640, 360,
-		255, 170, 60, 255);
-	EndRenderer();	
+	//for (uint32 entity = 0; entity < ENTITY_COUNT; ++entity)
+	//{
+	//	if (HasComponent(&game->world, entity, COMPONENT_SPRITE))
+	//		SpriteRender(&game->world, entity, render_context);
+	//}
+	//
+	//if (game->render_aabbs)
+	//{
+	//	for (int i = 0; i < AABB_COUNT; ++i)
+	//	{
+	//		if (game->world.aabbs[i].mask != AABB_NONE)
+	//		{
+	//			float width = game->world.aabbs[i].max.x - game->world.aabbs[i].min.x;
+	//			float height = game->world.aabbs[i].max.y - game->world.aabbs[i].min.y;
+	//			float x = game->world.aabbs[i].min.x + width*0.5f;
+	//			float y = game->world.aabbs[i].min.y + height*0.5f;
+	//			RenderSquare(render_context, x, y, width, height, 0.0f, 255, 0, 0, 150, true);
+	//		}
+	//	}
+	//}
+
+	//RenderSquare(render_context, game->camera_pos.x, game->camera_pos.y, 32.0f, 32.0f, 255, 255, 170, 255);
+	//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	//BeginRenderer(render_context);
+	//RenderTexture(render_context, 0.0f, 0.0f, &game->paul);
+
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//RenderTexture(render_context, 1920.0f*0.5f, 1080.0f*0.5f, &fbt);
+	//EndRenderer();	
 
 
 }
