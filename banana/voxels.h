@@ -14,6 +14,7 @@ struct VoxelRenderContext
 	GLint color_loc;
 	GLint camera_loc;
 	GLint world_loc;
+	GLint instanced_loc;
 	Shader diffuse;
 	int v_count;
 };
@@ -30,5 +31,21 @@ void RenderVoxel(VoxelRenderContext *context, Vector3 position,  Vector3 scale,
 
 void RenderVoxel(VoxelRenderContext *context, Vector3 position, Vector3 scale,
 	Vector3 rotation, uint8 r, uint8 g, uint8 b, uint8 a, bool outline = false);
+
+struct Model
+{
+	GLuint vao;
+	GLuint vbo;
+	GLuint ebo;
+	GLuint tbo;
+	GLuint cbo;
+	int voxel_num;
+};
+
+#include "mvload.h"
+
+void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_model);
+void RenderModel(VoxelRenderContext *context, Model *model, Vector3 position, Vector3 scale,
+	Vector3 rotation);
 
 #endif // VOXELS_H

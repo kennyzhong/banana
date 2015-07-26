@@ -187,7 +187,7 @@ int main(int argc, char *args[])
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glClearColor(1.0f, 1.0f, 0.6f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.6f, 0.0f);
 
 	bool running = true;
 	SDL_Event e;

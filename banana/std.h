@@ -43,8 +43,14 @@ inline static int printOglError(char *file, int line) {
 
 	glErr = glGetError();
 	if (glErr != GL_NO_ERROR) {
-		printf("glError in file %s @ line %d: %s\n",
-			file, line, gluErrorString(glErr));
+		std::string s = "glError in file ";
+		s.append(file);
+		s.append(" @ line ");
+		s.append(std::to_string(line));
+		s.append(": ");
+		s.append((const char *)gluErrorString(glErr));
+		s.append("\n");
+		Error(s);
 		retCode = 1;
 	}
 

@@ -6,6 +6,7 @@
 #include "gl_util.h"
 #include "world.h"
 #include "mvload.h"
+#include "voxels.h"
 
 struct InputData;
 struct RenderContext;
@@ -38,7 +39,8 @@ struct GameState
 	float blue;
 	Shader world_shader;
 	Texture paul;
-	MV_Model model;
+	MV_Model mv_model;
+	Model model;
 
 	Vector3 camera3d_pos;
 	Vector3 camera3d_rot;
