@@ -6,18 +6,6 @@
 #include "input.h"
 #include "rendering.h"
 #include "voxels.h"
-#include "tinyxml2.h"
-
-internal Vector2 GetTileFromID(int id, Texture *texture, float tile_size)
-{
-	Vector2 pos;
-	pos.x = tile_size * (id % (int)(texture->width / tile_size));
-	pos.y = tile_size * (id / (int)(texture->width / tile_size));
-	return pos;
-}
-
-global_variable int instance_num = 0;
-global_variable GLuint world_vbo, world_vao, world_ebo, world_tbo, world_tobo;
 
 global_variable float rot = 0.0f;
 
@@ -28,9 +16,6 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	if (!game->initialized)
 	{
 		// Initailzation
-		game->sheet = LoadTexture("assets/sheet.png");
-		game->entities = LoadTexture("assets/entities.png");
-		game->tile = LoadTexture("assets/player.png");
 		game->paul = LoadTexture("assets/paul.png");
 
 		for (int i = 0; i < AABB_COUNT; ++i)
@@ -38,21 +23,11 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		SDL_Log("%0.2f, %0.2f, %0.2f, %0.2f", game->world.aabbs[i].min.x, game->world.aabbs[i].min.y,
 			game->world.aabbs[i].max.x, game->world.aabbs[i].max.y);
 
-		game->camera_pos = Vector2(0.0f, 0.0f);
-		game->camera_scale = 2.6f;
-
-		game->player = CreatePlayer(&game->world, Vector2(96.0f, 96.0f), &game->entities);
-		game->color_change_loc = glGetUniformLocation(render_context->diffuse.program, "color_change");
-		game->initialized = true;
-
-		game->red = 1.0f;
-		game->green = 1.0f;
-		game->blue = 1.0f;
+		//game->player = CreatePlayer(&game->world, Vector2(96.0f, 96.0f), &game->entities);
 
 		game->camera3d_pos = Vector3(0.0f, 0.0f, -20.0f);
 		game->camera3d_rot = Vector3(0.0f, 0.0f, 0.0f);
 
-		game->world_shader = CreateShader("assets/shaders/world.vert", "assets/shaders/world.frag");
 
 		// FBO stuff
 		/*glGenFramebuffers(1, &fbo);
@@ -74,6 +49,8 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		fbt.id = fto;*/
 		game->mv_model = LoadModel("assets/chr_knight.vox");
 		InitializeModel(voxel_render_context, &game->model, &game->mv_model);
+
+		game->initialized = true;
 	}
 
 	// Update
@@ -108,25 +85,6 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		if (IsKeyPressed(input, "f9"))
 			game->render_aabbs = !game->render_aabbs;
 
-		if (IsKeyPressed(input, "f1"))
-		{
-			if (game->red == 1) game->red = 0;
-			else game->red = 1;
-		}
-
-		if (IsKeyPressed(input, "f2"))
-		{
-			if (game->green == 1) game->green = 0;
-			else game->green = 1;
-		}
-
-
-		if (IsKeyPressed(input, "f3"))
-		{
-			if (game->blue == 1) game->blue = 0;
-			else game->blue = 1;
-		}
-
 		if (IsKeyDown(input, "w"))
 			game->camera3d_pos.z += 10.0f * delta;
 		if (IsKeyDown(input, "s"))
@@ -148,13 +106,6 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			game->camera3d_rot.x += 20 * delta;
 		if (IsKeyDown(input, "down"))
 			game->camera3d_rot.x -= 20 * delta;
-
-		/*if (game->camera_pos.x < 0) game->camera_pos.x = 0;
-		if (game->camera_pos.y < 0) game->camera_pos.y = 0;
-		if (game->camera_pos.x + 1920.0f / game->camera_scale > MAP_W*32.0f + 16.0f)
-			game->camera_pos.x = (MAP_W*32.0f + 16.0f) - 1920.0f / game->camera_scale;
-		if (game->camera_pos.y + 1080.0f / game->camera_scale > MAP_H*32.0f + 16.0f)
-			game->camera_pos.y = (MAP_H*32.0f + 16.0f) - 1080.0f / game->camera_scale;*/
 
 		rot += 100.0f * delta;
 	}

@@ -24,20 +24,10 @@ struct GameMemory
 struct GameState
 {
 	float time;
-	int map[MAP_H][MAP_W];
-	Vector2 camera_pos;
-	float camera_scale;
 	World world;
-	Texture sheet;
-	Texture entities;
-	Texture tile;
 	bool render_aabbs = false;
 	uint32 player;
 	GLint color_change_loc;
-	float red;
-	float green;
-	float blue;
-	Shader world_shader;
 	Texture paul;
 	MV_Model mv_model;
 	Model model;
