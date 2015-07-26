@@ -181,6 +181,7 @@
     <ClInclude Include="gl_util.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="math.h" />
+    <ClInclude Include="mvload.h" />
     <ClInclude Include="rendering.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="std.h" />

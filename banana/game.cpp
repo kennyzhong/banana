@@ -33,6 +33,9 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		game->tile = LoadTexture("assets/player.png");
 		game->paul = LoadTexture("assets/paul.png");
 
+		game->model = LoadModel("assets/8x8x8.vox");
+		Error(std::to_string(game->model.num_voxels), false);
+
 		using namespace tinyxml2;
 		XMLDocument doc;
 		doc.LoadFile("assets/maps/map01.tmx");
@@ -293,19 +296,24 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	// Rendering
 	RenderClear(render_context, 32, 20, 41, 255, GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	//glPolygonMode(GL_FRONT, GL_LINE);
-	//glPolygonMode(GL_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT, GL_LINE);
+	glPolygonMode(GL_BACK, GL_LINE);
 
 	BeginVoxelRenderer(voxel_render_context, 
 		Matrix4_translate(game->camera3d_pos.x, game->camera3d_pos.y, game->camera3d_pos.z));
-	RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), 
-		game->camera3d_rot, 255, 0, 0, 255, false);
+	/*RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), 
+		game->camera3d_rot, 255, 0, 0, 255, false);*/
+	for (int i = 0; i < game->model.num_voxels; ++i)
+	{
+		MV_Voxel vox = game->model.voxels[i];
+		RenderVoxel(voxel_render_context, Vector3((float)vox.x, (float)vox.y, (float)vox.z),
+			Vector3(1.0f, 1.0f, 1.0f), 255, 0, 0, 255);
+	}
 	EndVoxelRenderer();
 
-	//glPolygonMode(GL_FRONT, GL_FILL);
-	//glPolygonMode(GL_BACK, GL_FILL);
-	glDisable(GL_DEPTH_TEST);
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glPolygonMode(GL_BACK, GL_FILL);
+	
 
 	//Matrix4 camera_matrix = Matrix4_scale(game->camera_scale, game->camera_scale, 1.0f) *
 	//	Matrix4_translate(-game->camera_pos.x, -game->camera_pos.y, 0.0f);

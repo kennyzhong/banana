@@ -84,5 +84,8 @@
     <ClInclude Include="voxels.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="mvload.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

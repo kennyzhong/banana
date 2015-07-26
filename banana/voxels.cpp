@@ -26,8 +26,8 @@ void InitializeVoxelContext(VoxelRenderContext *context)
 	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	glEnableVertexAttribArray(pos);
 
-	Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
-	Vector3 down = Vector3(0.0f, -1.0f, 0.0f);
+	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
+	Vector3 down = Vector3(0.0f, 1.0f, 0.0f);
 	Vector3 right = Vector3(1.0f, 0.0f, 0.0f);
 	Vector3 left = Vector3(-1.0f, 0.0f, 0.0f);
 	Vector3 forward = Vector3(0.0f, 0.0f, -1.0f);
@@ -58,21 +58,27 @@ void InitializeVoxelContext(VoxelRenderContext *context)
 
 
 	GLuint elements[] = {
+		// back
 		0, 1, 2,
 		0, 2, 3,
 
+		// right
 		1, 5, 6,
 		1, 6, 2,
 		
+		// front
 		5, 4, 7,
 		5, 7, 6,
 		
+		// left
 		4, 0, 3,
 		4, 3, 7,
 		
+		// top
 		4, 5, 0,
 		0, 5, 1,
 		
+		// bottom
 		3, 2, 7,
 		7, 2, 6
 	};
@@ -111,10 +117,13 @@ void BeginVoxelRenderer(VoxelRenderContext *context, Matrix4 camera)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, context->ebo);
 	BindShader(&context->diffuse);
 	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
+	glEnable(GL_DEPTH_TEST);
+
 }
 
 void EndVoxelRenderer()
 {
+	glDisable(GL_DEPTH_TEST);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
