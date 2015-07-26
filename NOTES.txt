@@ -1,0 +1,3 @@
+Voxel Rendering Stuff
+	- Voxels should be instanced and then the model should be transformed using a uniform transformation passed into the shader.
+	-
