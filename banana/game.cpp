@@ -8,6 +8,50 @@
 #include "voxels.h"
 
 global_variable float rot = 0.0f;
+global_variable Vector3 y_axis = Vector3(0.0f, 1.0f, 0.0f);
+
+void MoveCamera(Camera *camera, Vector3 dir, float amount)
+{
+	camera->position += dir * amount;
+}
+
+Vector3 CameraLeft(Camera *camera)
+{
+	Vector3 left = Cross(camera->forward, camera->up);
+	Normalize(left);
+	return left;
+}
+
+Vector3 CameraRight(Camera *camera)
+{
+	Vector3 right = Cross(camera->up, camera->forward);
+	Normalize(right);
+	return right;
+}
+
+void CameraRotateY(Camera *camera, float angle)
+{
+	Vector3 h_axis = Cross(y_axis, camera->forward);
+	Normalize(h_axis);
+
+	Rotate(camera->forward, angle, y_axis);
+	Normalize(camera->forward);
+
+	camera->up = Cross(camera->forward, h_axis);
+	Normalize(camera->up);
+}
+
+void CameraRotateX(Camera *camera, float angle)
+{
+	Vector3 h_axis = Cross(y_axis, camera->forward);
+	Normalize(h_axis);
+
+	Rotate(camera->forward, angle, h_axis);
+	Normalize(camera->forward);
+
+	camera->up = Cross(camera->forward, h_axis);
+	Normalize(camera->up);
+}
 
 void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContext *render_context,
 	VoxelRenderContext *voxel_render_context, bool &paused, float delta)
@@ -25,28 +69,8 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 
 		//game->player = CreatePlayer(&game->world, Vector2(96.0f, 96.0f), &game->entities);
 
-		game->camera3d_pos = Vector3(0.0f, 0.0f, 20.0f);
-		game->camera3d_dir = Vector3(0.0f, 0.0f, 1.0f);
+		game->camera = { Vector3(0.0f, 5.0f, 20.0f), Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 1.0f, 0.0f) };
 
-
-		// FBO stuff
-		/*glGenFramebuffers(1, &fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glGenTextures(1, &fto);
-		glBindTexture(GL_TEXTURE_2D, fto);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fto, 0);
-		GLenum draw_buffers[1] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, draw_buffers);
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			Error("Framebuffer error", true);
-
-		fbt.width = 1920;
-		fbt.height = 1080;
-		fbt.id = fto;*/
 		game->mv_model = LoadModel("assets/chr_seek.vox");
 
 		game->mv_maze = LoadModel("assets/maze2D.vox");
@@ -87,55 +111,61 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 
 		if (IsKeyPressed(input, "f9"))
 			game->render_aabbs = !game->render_aabbs;
+		
+		if (IsKeyDown(input, "right"))
+			CameraRotateY(&game->camera, 100 * delta);
+		if (IsKeyDown(input, "left"))
+			CameraRotateY(&game->camera, -100 * delta);
+		/*if (IsKeyDown(input, "up"))
+			CameraRotateX(&game->camera, 100 * delta);
+		if (IsKeyDown(input, "down"))
+			CameraRotateX(&game->camera, -100 * delta);*/
 
 		if (IsKeyDown(input, "w"))
-			game->camera3d_pos.z -= 10.0f * delta;
+			//MoveCamera(&game->camera, game->camera.forward, -10 * delta);
+			game->camera.position = game->camera.position + game->camera.forward * -10.0f * delta;
 		if (IsKeyDown(input, "s"))
-			game->camera3d_pos.z += 10.0f * delta;
+			MoveCamera(&game->camera, game->camera.forward, 10 * delta);
 		if (IsKeyDown(input, "a"))
-			game->camera3d_pos.x -= 10.0f * delta;
+			MoveCamera(&game->camera, CameraLeft(&game->camera), 10 * delta);
 		if (IsKeyDown(input, "d"))
-			game->camera3d_pos.x += 10.0f * delta;
-		if (IsKeyDown(input, "space"))
-			game->camera3d_pos.y += 10.0f * delta;
-		if (IsKeyDown(input, "left shift"))
-			game->camera3d_pos.y -= 10.0f * delta;
+			MoveCamera(&game->camera, CameraRight(&game->camera), 10 * delta);
 
-		if (IsKeyDown(input, "right"))
+		/*if (IsKeyDown(input, "right"))
 			rot -= 100.0f * delta;
 		if (IsKeyDown(input, "left"))
-			rot += 100.0f * delta;
+			rot += 100.0f * delta;*/
 
-		//game->camera3d_dir.x = (float)cosf(rot);
-		//game->camera3d_dir.z = (float)sinf(rot);
 	}
 	// Rendering
-	RenderClear(render_context, 32, 20, 41, 255, GL_DEPTH_BUFFER_BIT);
-	Matrix4 camera_mat = Matrix4_lookat(game->camera3d_pos, game->camera3d_pos + game->camera3d_dir,
-		Vector3(0.0f, 1.0f, 0.0f));
+	RenderClear(render_context, 50, 203, 255, 255, GL_DEPTH_BUFFER_BIT);
+	Matrix4 camera_mat = Matrix4_lookat(game->camera.position, game->camera.position + game->camera.forward,
+		game->camera.up);
 
 	BeginModelRenderer(voxel_render_context, camera_mat);
-	RenderModel(voxel_render_context, &game->model, Vector3(0.0f, 2.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, rot, 0.0f));
-	RenderModel(voxel_render_context, &game->maze, Vector3(0.0f, -7.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), Vector3());
+	glUniform3f(glGetUniformLocation(voxel_render_context->diffuse.program, "light_direction"),
+		-1.0f, -1.0f, -1.0f);
+	RenderModel(voxel_render_context, &game->model, Vector3(10.0f, game->model.size.y*0.5f, 0.0f), Vector3(1.0f, 1.0f, 1.0f),
+		Vector3(0.0f, rot, 0.0f));
 	EndModelRenderer();
-	BeginVoxelRenderer(voxel_render_context, 
-		camera_mat);
-	/*glPolygonMode(GL_FRONT, GL_LINE);
-	glPolygonMode(GL_BACK, GL_LINE);*/
-	//glCullFace(GL_FRONT);
+
+	BeginVoxelRenderer(voxel_render_context, camera_mat);
+	RenderVoxel(voxel_render_context, Vector3(0.0f, -0.5f, 0.0f), Vector3(100.0f, 1.0f, 50.0f), 0, 150, 0, 255);
 	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, rot, 0.0f), 255, 0, 0, 255);
-	//glCullFace(GL_BACK);
-	/*glPolygonMode(GL_FRONT, GL_FILL);
-	glPolygonMode(GL_BACK, GL_FILL);*/
 	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), 255, 0, 0, 255);
 	EndVoxelRenderer();
+	BeginRenderer(render_context);
+	std::string p = "X: " + std::to_string(game->camera.position.x) + " Y: " + 
+		std::to_string(game->camera.position.y) + " Z: " + std::to_string(game->camera.position.z);
+	RenderString(render_context, 40.0f, 60.0f, p.c_str(), 0.0f);
 
-	//RenderSquare(render_context, game->camera_pos.x, game->camera_pos.y, 32.0f, 32.0f, 255, 255, 170, 255);
-	//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	//BeginRenderer(render_context);
-	//RenderTexture(render_context, 700.0f, 700.0f, &game->paul);
+	std::string f = "X: " + std::to_string(game->camera.forward.x) + " Y: " +
+		std::to_string(game->camera.forward.y) + " Z: " + std::to_string(game->camera.forward.z);
+	RenderString(render_context, 40.0f, 80.0f, f.c_str(), 0.0f);
 
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//RenderTexture(render_context, 1920.0f*0.5f, 1080.0f*0.5f, &fbt);
-	//EndRenderer();	
+	std::string u = "X: " + std::to_string(game->camera.up.x) + " Y: " +
+		std::to_string(game->camera.up.y) + " Z: " + std::to_string(game->camera.up.z);
+	RenderString(render_context, 40.0f, 100.0f, u.c_str(), 0.0f);
+
+	EndRenderer();
 }

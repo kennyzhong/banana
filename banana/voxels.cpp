@@ -148,11 +148,12 @@ void BeginVoxelRenderer(VoxelRenderContext *context, Matrix4 camera)
 	BindShader(&context->diffuse);
 	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
 	glEnable(GL_DEPTH_TEST);
-
+	glDisable(GL_BLEND);
 }
 
 void EndVoxelRenderer()
 {
+	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(0);
 	glUseProgram(0);
@@ -191,10 +192,12 @@ void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera)
 	BindShader(&context->diffuse);
 	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 }
 
 void EndModelRenderer()
 {
+	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glUseProgram(0);
 }
@@ -204,6 +207,9 @@ void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_mod
 
 	std::vector<Matrix4> transforms;
 	std::vector<Vector3> colors;
+	model->size.x = mv_model->size_x;
+	model->size.y = mv_model->size_y;
+	model->size.z = mv_model->size_z;
 
 	for (int i = 0; i < mv_model->num_voxels; ++i)
 	{

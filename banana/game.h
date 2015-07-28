@@ -21,6 +21,13 @@ struct GameMemory
 #define MAP_W 60
 #define MAP_H 34
 
+struct Camera
+{
+	Vector3 position;
+	Vector3 forward;
+	Vector3 up;
+};
+
 struct GameState
 {
 	float time;
@@ -34,8 +41,7 @@ struct GameState
 	MV_Model mv_maze;
 	Model maze;
 
-	Vector3 camera3d_pos;
-	Vector3 camera3d_dir;
+	Camera camera;
 
 	bool32 initialized;
 };

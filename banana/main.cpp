@@ -325,7 +325,7 @@ int main(int argc, char *args[])
 		BeginRenderer(&render_context);
 
 		std::string s = "FRAMETIME " + std::to_string(msPerFrame);
-		RenderString(&render_context, 180.0f, 40.0f, s.c_str(), 0.0f);
+		RenderString(&render_context, 40.0f, 40.0f, s.c_str(), 0.0f);
 
 		EndRenderer();
 

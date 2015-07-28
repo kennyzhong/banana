@@ -44,6 +44,8 @@ struct Vector3
 	Vector3 operator+(const Vector3 &other);
 	Vector3 operator-(const Vector3 &other);
 
+	Vector3 operator-();
+
 	bool operator<(const Vector3 &other);
 	bool operator>(const Vector3 &other);
 
@@ -65,6 +67,7 @@ struct Vector3
 
 float Length(Vector3 input);
 void Normalize(Vector3 &input);
+void Rotate(Vector3 &input, float angle, Vector3 axis);
 Vector3 Cross(Vector3 a, Vector3 b);
 float Dot(Vector3 a, Vector3 b);
 
@@ -102,5 +105,20 @@ Matrix4 Matrix4_lookat(Vector3 eye, Vector3 target, Vector3 up);
 float ToDegrees(float radians);
 float ToRadians(float degrees);
 float Clamp(float input, float min, float max);
+
+struct Quaternion
+{
+	Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {};
+	Quaternion() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {};
+
+	float x, y, z, w;
+
+	Quaternion operator*(const Quaternion &other);
+	Quaternion operator*(const Vector3 &other);
+};
+
+float Length(Quaternion quat);
+void Normalize(Quaternion &quat);
+void Conjugate(Quaternion &quat);
 
 #endif // MATH_H

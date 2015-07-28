@@ -171,8 +171,8 @@ void RenderString(RenderContext *context, float x, float y, const char *text, fl
 	float total_width = (float)strlen(text) * (char_width + spacing);
 	for (int i = 0; i < strlen(text); ++i)
 	{
-		float xx = (x - (total_width * 0.5f)) + i * (char_width + spacing);
-		float yy = y - (char_height * 0.5f);
+		float xx =  x + i * (char_width + spacing);
+		float yy = y;
 		int font_index = (int)font_text.find(text[i]);
 		float offset_x = font_index * char_width;
 

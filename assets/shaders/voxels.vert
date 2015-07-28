@@ -16,14 +16,11 @@ uniform int instanced;
 
 void main()
 {
-	mat4 mvp;
+	mat4 mvp = projection * camera * world;
 	if(instanced == 1)
-		mvp = projection * camera * world * world_instanced;
-	else
-		mvp = projection * camera * world;
+		mvp *= world_instanced;
 
 	gl_Position =  mvp * vec4(position, 1.0);
-	normal_original = normal;
 	normal0 =  (mvp * vec4(normal, 0.0)).xyz;
 	color_instanced0 = color_instanced;
 }

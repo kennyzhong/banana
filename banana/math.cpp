@@ -132,6 +132,15 @@ void Vector3::operator-=(const Vector3 &other)
 	z -= other.z;
 }
 
+Vector3 Vector3::operator-()
+{
+	Vector3 result;
+	result.x = -x;
+	result.y = -y;
+	result.z = -z;
+	return result;
+}
+
 Vector3 Vector3::operator*(float f)
 {
 	Vector3 result;
@@ -219,6 +228,33 @@ void Normalize(Vector3 &input)
 		input.y = input.y / l;
 		input.z = input.z / l;
 	}
+}
+
+void Rotate(Vector3 &input, float angle, Vector3 axis)
+{
+	/*float sin_half_angle = (float)sinf(ToRadians(angle / 2));
+	float cos_half_angle = (float)cosf(ToRadians(angle / 2));
+
+	Quaternion rotation;
+	rotation.x = axis.x * sin_half_angle;
+	rotation.y = axis.y * sin_half_angle;
+	rotation.z = axis.z * sin_half_angle;
+	rotation.z = cos_half_angle;
+
+	Quaternion conjugate = rotation;
+	Conjugate(conjugate);
+
+	Quaternion w = (rotation * input) * conjugate;
+
+	input.x = w.x;
+	input.y = w.y;
+	input.z = w.z;*/
+	// Todegrees seems to be turning to radians?? 
+	float sin_angle = (float)sinf(-ToDegrees(angle));
+	float cos_angle = (float)cosf(-ToDegrees(angle));
+
+	Vector3 r = Cross(input, axis * sin_angle) + (input * cos_angle) + (axis * Dot(input, axis * (1 - cos_angle)));
+	input = r;
 }
 
 Vector3 Cross(Vector3 a, Vector3 b)
@@ -364,6 +400,7 @@ Matrix4 Matrix4_lookat(Vector3 eye, Vector3 target, Vector3 up)
 {
 	Vector3 forward = target - eye;
 	Normalize(forward);
+
 	Vector3 side = Cross(forward, up);
 	Normalize(side);
 	up = Cross(side, forward);
@@ -376,10 +413,10 @@ Matrix4 Matrix4_lookat(Vector3 eye, Vector3 target, Vector3 up)
 	m.m31 = -eye.y;
 	m.m32 = -eye.z;*/
 
-	m.m00 = side.x; m.m01 = side.y; m.m02 = side.z;
-	m.m10 = up.x, m.m11 = up.y;	m.m12 = up.z;
-	m.m20 = -forward.x; m.m21 = -forward.y; m.m22 = -forward.z;
-	m.m30 = -eye.x; m.m31 = -eye.y; m.m32 = -eye.z;
+	m.m00 = side.x;		m.m01 = side.y;		m.m02 = side.z;
+	m.m10 = up.x,		m.m11 = up.y;		m.m12 = up.z;
+	m.m20 = -forward.x;	m.m21 = -forward.y;	m.m22 = -forward.z;
+	m.m30 = -eye.x;		m.m31 = -eye.y;		m.m32 = -eye.z;
 	return m;
 }
 
@@ -398,4 +435,51 @@ float Clamp(float input, float  min, float max)
 	if (input < min) return min;
 	if (input > max) return max;
 	return input;
+}
+
+// Quaternion
+float Length(Quaternion quat)
+{
+	return (float)sqrtf(quat.x * quat.x + quat.y * quat.y + quat.z * quat.z + quat.w * quat.w);
+}
+
+void Normalize(Quaternion &quat)
+{
+	float length = Length(quat);
+	quat.x /= length;
+	quat.y /= length;
+	quat.z /= length;
+	quat.w /= length;
+}
+
+void Conjugate(Quaternion &quat)
+{
+	quat.x = -quat.x;
+	quat.y = -quat.y;
+	quat.z = -quat.z;
+	quat.w = -quat.w;
+}
+
+Quaternion Quaternion::operator*(const Quaternion &other)
+{
+	Quaternion result;
+
+	result.w = w * other.w - x * other.x - y * other.y - z * other.z;
+	result.x = x * other.w + w * other.x + y * other.z - z * other.y;
+	result.y = y * other.w + w * other.y + z * other.x - x * other.z;
+	result.z = z * other.w + w * other.z + x * other.y - y * other.x;
+
+	return result;
+}
+
+Quaternion Quaternion::operator*(const Vector3 &other)
+{
+	Quaternion result;
+
+	result.w = -x * other.x - y * other.y - z * other.z;
+	result.x =	w * other.x + y * other.z - z * other.y;
+	result.y =	w * other.y + z * other.x - x * other.z;
+	result.z =	w * other.z + x * other.y - y * other.x;
+
+	return result;
 }

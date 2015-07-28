@@ -41,6 +41,7 @@ struct Model
 	GLuint tbo;
 	GLuint cbo;
 	int voxel_num;
+	Vector3 size;
 };
 
 #include "mvload.h"
