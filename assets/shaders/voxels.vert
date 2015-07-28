@@ -6,6 +6,7 @@ in mat4 world_instanced;
 in vec3 color_instanced;
 
 out vec3 normal0;
+out vec3 normal_original;
 out vec3 color_instanced0;
 
 uniform mat4 projection;
@@ -22,6 +23,7 @@ void main()
 		mvp = projection * camera * world;
 
 	gl_Position =  mvp * vec4(position, 1.0);
+	normal_original = normal;
 	normal0 =  (mvp * vec4(normal, 0.0)).xyz;
 	color_instanced0 = color_instanced;
 }

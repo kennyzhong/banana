@@ -205,6 +205,34 @@ bool Vector3::operator!=(const Vector3 &other)
 	return false;
 }
 
+float Length(Vector3 input)
+{
+	return (float)sqrtf(input.x * input.x + input.y * input.y + input.z * input.z);
+}
+
+void Normalize(Vector3 &input)
+{
+	float l = Length(input);
+	if (l != 0)
+	{
+		input.x = input.x / l;
+		input.y = input.y / l;
+		input.z = input.z / l;
+	}
+}
+
+Vector3 Cross(Vector3 a, Vector3 b)
+{
+	return Vector3(
+		a.y * b.z - a.z * b.y,
+		a.z * b.x - a.x * b.z,
+		a.x * b.y - a.y * b.x);
+}
+
+float Dot(Vector3 a, Vector3 b)
+{
+	return a.x * b.x + a.y * b.y + a.x * b.z;
+}
 
 Matrix4 Matrix4::operator*(const Matrix4 &m2)
 {
@@ -302,7 +330,7 @@ Matrix4 Matrix4_rotate(float angle, float x, float y, float z)
 
 	c = cosf(M_PI*angle / 180.0f);
 	s = sinf(M_PI*angle / 180.0f);
-	norm = sqrtf(x*x + y*y + z*z);
+	norm = Length(Vector3(x, y, z));
 
 	x /= norm;
 	y /= norm;
@@ -329,6 +357,29 @@ Matrix4 Matrix4_scale(float x, float y, float z)
 	m.m00 = x;
 	m.m11 = y;
 	m.m22 = z;
+	return m;
+}
+
+Matrix4 Matrix4_lookat(Vector3 eye, Vector3 target, Vector3 up)
+{
+	Vector3 forward = target - eye;
+	Normalize(forward);
+	Vector3 side = Cross(forward, up);
+	Normalize(side);
+	up = Cross(side, forward);
+
+	Matrix4 m = Matrix4_identity();
+	/*m.m00 = side.x; m.m01 = up.x; m.m02 = -forward.x;
+	m.m10 = side.y; m.m11 = up.y; m.m12 = -forward.y;
+	m.m20 = side.z; m.m21 = up.z; m.m22 = -forward.z;
+	m.m30 = -eye.x;
+	m.m31 = -eye.y;
+	m.m32 = -eye.z;*/
+
+	m.m00 = side.x; m.m01 = side.y; m.m02 = side.z;
+	m.m10 = up.x, m.m11 = up.y;	m.m12 = up.z;
+	m.m20 = -forward.x; m.m21 = -forward.y; m.m22 = -forward.z;
+	m.m30 = -eye.x; m.m31 = -eye.y; m.m32 = -eye.z;
 	return m;
 }
 

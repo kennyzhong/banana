@@ -63,6 +63,11 @@ struct Vector3
 	void operator/=(float f);
 };
 
+float Length(Vector3 input);
+void Normalize(Vector3 &input);
+Vector3 Cross(Vector3 a, Vector3 b);
+float Dot(Vector3 a, Vector3 b);
+
 
 #ifndef M_PI
 #    define M_PI 3.14159265358979323846f
@@ -92,6 +97,7 @@ Matrix4 Matrix4_perspective(float fovy, float aspect, float znear, float zfar);
 Matrix4 Matrix4_translate(float x, float y, float z);
 Matrix4 Matrix4_rotate(float angle, float x, float y, float z);
 Matrix4 Matrix4_scale(float x, float y, float z);
+Matrix4 Matrix4_lookat(Vector3 eye, Vector3 target, Vector3 up);
 
 float ToDegrees(float radians);
 float ToRadians(float degrees);

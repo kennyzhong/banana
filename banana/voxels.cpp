@@ -2,86 +2,113 @@
 #include "voxels.h"
 
 global_variable float v = 0.5f;
-global_variable float vertices[] = {
-	-v, v, -v,				// 0 Front top left
-	v, v, -v,				// 1 Front top right
-	v, -v, -v,				// 2 Front botom right
-	-v, -v, -v,				// 3 Front bottom left
 
-	-v, v, v,				// 4 Back top left
-	v, v, v,				// 5 Back top right
-	v, -v, v,				// 6 Back botom right
-	-v, -v, v,				// 7 Back bottom left
+global_variable Vector3 front_top_left = Vector3(-v, v, -v);
+global_variable Vector3 front_top_right = Vector3(v, v, -v);
+global_variable Vector3 front_bottom_left = Vector3(-v, -v, -v);
+global_variable Vector3 front_bottom_right = Vector3(v, -v, -v);
+
+global_variable Vector3 back_top_left = Vector3(-v, v, v);
+global_variable Vector3 back_top_right = Vector3(v, v, v);
+global_variable Vector3 back_bottom_left = Vector3(-v, -v, v);
+global_variable Vector3 back_bottom_right = Vector3(v, -v, v);
+
+global_variable Vector3 vertices[] {
+	// Front face
+	front_top_left,
+	front_top_right,
+	front_bottom_right,
+	front_bottom_left,
+		// Right face
+	front_top_right,
+	back_top_right,
+	back_bottom_right,
+	front_bottom_right,
+	// Back face
+	back_top_right,
+	back_top_left,
+	back_bottom_left,
+	back_bottom_right,
+	// Left face
+	back_top_left,
+	front_top_left,
+	front_bottom_left,
+	back_bottom_left,
+	// Top Face	
+	back_top_left,
+	back_top_right,
+	front_top_right,
+	front_top_left,
+	// Bottom Face
+	front_bottom_left,
+	front_bottom_right,
+	back_bottom_right,
+	back_bottom_left
 };
 
-global_variable Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
-global_variable Vector3 down = Vector3(0.0f, 1.0f, 0.0f);
+global_variable Vector3 front = Vector3(0.0f, 0.0f, -1.0f);
 global_variable Vector3 right = Vector3(1.0f, 0.0f, 0.0f);
-global_variable Vector3 left = Vector3(-1.0f, 0.0f, 0.0f);
-global_variable Vector3 forward = Vector3(0.0f, 0.0f, -1.0f);
 global_variable Vector3 back = Vector3(0.0f, 0.0f, 1.0f);
+global_variable Vector3 left = Vector3(-1.0f, 0.0f, 0.0f);
+global_variable Vector3 top = Vector3(0.0f, 1.0f, 0.0f);
+global_variable Vector3 bottom = Vector3(0.0f, -1.0f, 0.0f);
 
 Vector3 normals[] =
 {
-	back, back, back, back, back, back,
-
-	right, right, right, right, right, right,
-
-	forward, forward, forward, forward, forward, forward,
-
-	left, left, left, left, left, left,
-
-	up, up, up, up, up, up,
-
-	down, down, down, down, down, down
+	// Front face
+	front, front, front, front,
+	// Right face
+	right, right, right, right,
+	// Back face
+	back, back, back, back,
+	// Left face
+	left, left, left, left,
+	// Top Face	
+	top, top, top, top,
+	// Bottom Face
+	bottom, bottom, bottom, bottom,
 };
 
 GLuint elements[] = {
-	// back
-	0, 1, 2,
-	0, 2, 3,
-
-	// right
-	1, 5, 6,
-	1, 6, 2,
-
-	// front
-	5, 4, 7,
-	5, 7, 6,
-
-	// left
-	4, 0, 3,
-	4, 3, 7,
-
-	// top
-	4, 5, 0,
-	0, 5, 1,
-
-	// bottom
-	3, 2, 7,
-	7, 2, 6
+	// Front face
+	0, 1, 3, 
+	3, 1, 2,
+	// right face
+	4, 5, 7,
+	7, 5, 6,
+	// back face
+	8, 9, 11,
+	11, 9, 10,
+	// left face
+	12, 13, 15,
+	15, 13, 14,
+	// top face	
+	16, 17, 19,
+	19, 17, 18,
+	// bottom face
+	20, 21, 23,
+	23, 21, 22
 };
 
 
 void InitializeVoxelContext(VoxelRenderContext *context)
 {
 
-	glGenBuffers(1, &context->vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, context->vbo);
 	glGenVertexArrays(1, &context->vao);
 	glBindVertexArray(context->vao);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(float), vertices, GL_STATIC_DRAW);
-	GLint pos = glGetAttribLocation(context->diffuse.program, "position");
 
-	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glGenBuffers(1, &context->vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, context->vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(Vector3), vertices, GL_STATIC_DRAW);
+	GLint pos = glGetAttribLocation(context->diffuse.program, "position");
+	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
 	glEnableVertexAttribArray(pos);
 
 	glGenBuffers(1, &context->nbo);
 	glBindBuffer(GL_ARRAY_BUFFER, context->nbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(normals) * sizeof(Vector3), normals, GL_STATIC_DRAW);
-	GLuint n = glGetAttribLocation(context->diffuse.program, "normal");
-	glVertexAttribPointer(n, 3, GL_FLOAT, GL_FALSE,
-		sizeof(Vector3), 0);
+	GLint n = glGetAttribLocation(context->diffuse.program, "normal");
+	glVertexAttribPointer(n, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
 	glEnableVertexAttribArray(n);
 
 
@@ -127,9 +154,7 @@ void BeginVoxelRenderer(VoxelRenderContext *context, Matrix4 camera)
 void EndVoxelRenderer()
 {
 	glDisable(GL_DEPTH_TEST);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glUseProgram(0);
 }
 
@@ -161,8 +186,22 @@ void RenderVoxel(VoxelRenderContext *context, Vector3 position, Vector3 scale,
 
 #include <vector>
 
+void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera)
+{
+	BindShader(&context->diffuse);
+	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
+	glEnable(GL_DEPTH_TEST);
+}
+
+void EndModelRenderer()
+{
+	glDisable(GL_DEPTH_TEST);
+	glUseProgram(0);
+}
+
 void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_model)
 {
+
 	std::vector<Matrix4> transforms;
 	std::vector<Vector3> colors;
 
@@ -170,8 +209,8 @@ void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_mod
 	{
 		transforms.push_back(Matrix4_translate(
 			(float)mv_model->voxels[i].x - (mv_model->size_x*0.5f),
-			(float)mv_model->voxels[i].y - (mv_model->size_y*0.5f),
-			(float)mv_model->voxels[i].z - (mv_model->size_z*0.5f)));
+			(float)mv_model->voxels[i].z - (mv_model->size_z*0.5f),
+			(float)mv_model->voxels[i].y - (mv_model->size_y*0.5f)));
 		MV_RGBA rgba = mv_model->palette[mv_model->voxels[i].color_index];
 		colors.push_back(Vector3(
 			rgba.r * (1.0f/255.0f), 
@@ -179,7 +218,8 @@ void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_mod
 			rgba.b * (1.0f / 255.0f)));
 	}
 	model->voxel_num = mv_model->num_voxels;
-	glBindVertexArray(context->vao);
+	glGenVertexArrays(1, &model->vao);
+	glBindVertexArray(model->vao);
 	glGenBuffers(1, &model->tbo);
 	glBindBuffer(GL_ARRAY_BUFFER, model->tbo);
 	glBufferData(GL_ARRAY_BUFFER, transforms.size() * sizeof(Matrix4), &transforms.front(), GL_STATIC_DRAW);
@@ -200,17 +240,43 @@ void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_mod
 	glVertexAttribPointer(c, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
 	glEnableVertexAttribArray(c);
 	glVertexAttribDivisor(c, 1);
+
+	glGenBuffers(1, &model->vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, model->vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(Vector3), vertices, GL_STATIC_DRAW);
+	GLint pos = glGetAttribLocation(context->diffuse.program, "position");
+
+	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
+	glEnableVertexAttribArray(pos);
+
+	glGenBuffers(1, &model->nbo);
+	glBindBuffer(GL_ARRAY_BUFFER, model->nbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(normals) * sizeof(Vector3), normals, GL_STATIC_DRAW);
+	GLuint n = glGetAttribLocation(context->diffuse.program, "normal");
+	glVertexAttribPointer(n, 3, GL_FLOAT, GL_FALSE,
+		sizeof(Vector3), 0);
+	glEnableVertexAttribArray(n);
+
+
+
+
+	context->v_count = sizeof(elements);
+
+	glGenBuffers(1, &context->ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, context->ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 }
 
 void RenderModel(VoxelRenderContext *context, Model *model, Vector3 position, Vector3 scale,
 	Vector3 rotation)
 {
 	//printOpenGLError();
+	glBindVertexArray(model->vao);
 	glUniform1i(context->instanced_loc, 1);
 	Matrix4 world = Matrix4_scale(scale.x, scale.y, scale.z)
 		* Matrix4_rotate(rotation.z, 0.0f, 0.0f, 1.0f)
 		* Matrix4_rotate(rotation.y, 0.0f, 1.0f, 0.0f)
-		* Matrix4_rotate(rotation.x - 90.0f, 1.0f, 0.0f, 0.0f)
+		* Matrix4_rotate(rotation.x, 1.0f, 0.0f, 0.0f)
 		* Matrix4_translate(position.x, position.y, position.z);
 	glUniformMatrix4fv(context->world_loc, 1, GL_FALSE, &world.data[0]);
 	glDrawElementsInstanced(GL_TRIANGLES, context->v_count, GL_UNSIGNED_INT, 0, model->voxel_num);

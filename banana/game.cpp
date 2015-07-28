@@ -25,8 +25,8 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 
 		//game->player = CreatePlayer(&game->world, Vector2(96.0f, 96.0f), &game->entities);
 
-		game->camera3d_pos = Vector3(0.0f, 0.0f, -20.0f);
-		game->camera3d_rot = Vector3(0.0f, 0.0f, 0.0f);
+		game->camera3d_pos = Vector3(0.0f, 0.0f, 20.0f);
+		game->camera3d_dir = Vector3(0.0f, 0.0f, 1.0f);
 
 
 		// FBO stuff
@@ -47,7 +47,10 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		fbt.width = 1920;
 		fbt.height = 1080;
 		fbt.id = fto;*/
-		game->mv_model = LoadModel("assets/chr_knight.vox");
+		game->mv_model = LoadModel("assets/chr_seek.vox");
+
+		game->mv_maze = LoadModel("assets/maze2D.vox");
+		InitializeModel(voxel_render_context, &game->maze, &game->mv_maze);
 		InitializeModel(voxel_render_context, &game->model, &game->mv_model);
 
 		game->initialized = true;
@@ -86,46 +89,45 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			game->render_aabbs = !game->render_aabbs;
 
 		if (IsKeyDown(input, "w"))
-			game->camera3d_pos.z += 10.0f * delta;
-		if (IsKeyDown(input, "s"))
 			game->camera3d_pos.z -= 10.0f * delta;
+		if (IsKeyDown(input, "s"))
+			game->camera3d_pos.z += 10.0f * delta;
 		if (IsKeyDown(input, "a"))
-			game->camera3d_pos.x += 10.0f * delta;
-		if (IsKeyDown(input, "d"))
 			game->camera3d_pos.x -= 10.0f * delta;
+		if (IsKeyDown(input, "d"))
+			game->camera3d_pos.x += 10.0f * delta;
 		if (IsKeyDown(input, "space"))
-			game->camera3d_pos.y -= 10.0f * delta;
-		if (IsKeyDown(input, "left shift"))
 			game->camera3d_pos.y += 10.0f * delta;
+		if (IsKeyDown(input, "left shift"))
+			game->camera3d_pos.y -= 10.0f * delta;
 
 		if (IsKeyDown(input, "right"))
-			game->camera3d_rot.y += 20 * delta;
+			rot -= 100.0f * delta;
 		if (IsKeyDown(input, "left"))
-			game->camera3d_rot.y -= 20 * delta;
-		if (IsKeyDown(input, "up"))
-			game->camera3d_rot.x += 20 * delta;
-		if (IsKeyDown(input, "down"))
-			game->camera3d_rot.x -= 20 * delta;
+			rot += 100.0f * delta;
 
-		rot += 100.0f * delta;
+		//game->camera3d_dir.x = (float)cosf(rot);
+		//game->camera3d_dir.z = (float)sinf(rot);
 	}
 	// Rendering
 	RenderClear(render_context, 32, 20, 41, 255, GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
+	Matrix4 camera_mat = Matrix4_lookat(game->camera3d_pos, game->camera3d_pos + game->camera3d_dir,
+		Vector3(0.0f, 1.0f, 0.0f));
+
+	BeginModelRenderer(voxel_render_context, camera_mat);
+	RenderModel(voxel_render_context, &game->model, Vector3(0.0f, 2.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, rot, 0.0f));
+	RenderModel(voxel_render_context, &game->maze, Vector3(0.0f, -7.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), Vector3());
+	EndModelRenderer();
+	BeginVoxelRenderer(voxel_render_context, 
+		camera_mat);
 	/*glPolygonMode(GL_FRONT, GL_LINE);
 	glPolygonMode(GL_BACK, GL_LINE);*/
-
-	BeginVoxelRenderer(voxel_render_context, 
-		Matrix4_translate(game->camera3d_pos.x, game->camera3d_pos.y, game->camera3d_pos.z));
-	/*RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), 
-		game->camera3d_rot, 255, 0, 0, 255, false);*/
-	/*for (int i = 0; i < game->mv_model.num_voxels; ++i)
-	{
-		MV_Voxel vox = game->mv_model.voxels[i];
-		RenderVoxel(voxel_render_context, Vector3((float)vox.x, (float)vox.y, (float)vox.z),
-			Vector3(1.0f, 1.0f, 1.0f),  255, 0, 0, 255);
-	}*/
-	RenderModel(voxel_render_context, &game->model, Vector3(0.0f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f));
+	//glCullFace(GL_FRONT);
+	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, rot, 0.0f), 255, 0, 0, 255);
+	//glCullFace(GL_BACK);
+	/*glPolygonMode(GL_FRONT, GL_FILL);
+	glPolygonMode(GL_BACK, GL_FILL);*/
+	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), 255, 0, 0, 255);
 	EndVoxelRenderer();
 
 	//RenderSquare(render_context, game->camera_pos.x, game->camera_pos.y, 32.0f, 32.0f, 255, 255, 170, 255);

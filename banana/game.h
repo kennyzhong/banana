@@ -31,9 +31,11 @@ struct GameState
 	Texture paul;
 	MV_Model mv_model;
 	Model model;
+	MV_Model mv_maze;
+	Model maze;
 
 	Vector3 camera3d_pos;
-	Vector3 camera3d_rot;
+	Vector3 camera3d_dir;
 
 	bool32 initialized;
 };
