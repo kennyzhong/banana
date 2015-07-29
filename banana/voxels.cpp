@@ -149,10 +149,12 @@ void BeginVoxelRenderer(VoxelRenderContext *context, Matrix4 camera)
 	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+	glCullFace(GL_FRONT);
 }
 
 void EndVoxelRenderer()
 {
+	glCullFace(GL_BACK);
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(0);
@@ -193,10 +195,12 @@ void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera)
 	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+	glCullFace(GL_FRONT);
 }
 
 void EndModelRenderer()
 {
+	glCullFace(GL_BACK);
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glUseProgram(0);

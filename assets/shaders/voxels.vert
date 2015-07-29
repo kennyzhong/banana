@@ -16,7 +16,7 @@ uniform int instanced;
 
 void main()
 {
-	mat4 mvp = projection * camera * world;
+	mat4 mvp = (projection * camera) * world;
 	if(instanced == 1)
 		mvp *= world_instanced;
 

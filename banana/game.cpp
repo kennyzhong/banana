@@ -69,7 +69,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 
 		//game->player = CreatePlayer(&game->world, Vector2(96.0f, 96.0f), &game->entities);
 
-		game->camera = { Vector3(0.0f, 5.0f, 20.0f), Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 1.0f, 0.0f) };
+		game->camera = { Vector3(0.0f, 5.0f, -20.0f), Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 1.0f, 0.0f) };
 
 		game->mv_model = LoadModel("assets/chr_seek.vox");
 
@@ -116,16 +116,15 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			CameraRotateY(&game->camera, 100 * delta);
 		if (IsKeyDown(input, "left"))
 			CameraRotateY(&game->camera, -100 * delta);
-		/*if (IsKeyDown(input, "up"))
-			CameraRotateX(&game->camera, 100 * delta);
+		if (IsKeyDown(input, "up"))
+			CameraRotateX(&game->camera, -100 * delta);
 		if (IsKeyDown(input, "down"))
-			CameraRotateX(&game->camera, -100 * delta);*/
+			CameraRotateX(&game->camera, 100 * delta);
 
 		if (IsKeyDown(input, "w"))
-			//MoveCamera(&game->camera, game->camera.forward, -10 * delta);
-			game->camera.position = game->camera.position + game->camera.forward * -10.0f * delta;
-		if (IsKeyDown(input, "s"))
 			MoveCamera(&game->camera, game->camera.forward, 10 * delta);
+		if (IsKeyDown(input, "s"))
+			MoveCamera(&game->camera, game->camera.forward, -10 * delta);
 		if (IsKeyDown(input, "a"))
 			MoveCamera(&game->camera, CameraLeft(&game->camera), 10 * delta);
 		if (IsKeyDown(input, "d"))
@@ -139,21 +138,24 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	}
 	// Rendering
 	RenderClear(render_context, 50, 203, 255, 255, GL_DEPTH_BUFFER_BIT);
-	Matrix4 camera_mat = Matrix4_lookat(game->camera.position, game->camera.position + game->camera.forward,
+	// Matrix4_lookat(game->camera.position, game->camera.position + game->camera.forward, game->camera.up)
+	Matrix4 camera_mat = Matrix4_translate(-game->camera.position.x, -game->camera.position.y,
+		-game->camera.position.z) * Matrix4_lookat(game->camera.position, game->camera.forward,
 		game->camera.up);
 
 	BeginModelRenderer(voxel_render_context, camera_mat);
 	glUniform3f(glGetUniformLocation(voxel_render_context->diffuse.program, "light_direction"),
-		-1.0f, -1.0f, -1.0f);
+		-1.0f, -1.0f, 1.0f);
 	RenderModel(voxel_render_context, &game->model, Vector3(10.0f, game->model.size.y*0.5f, 0.0f), Vector3(1.0f, 1.0f, 1.0f),
 		Vector3(0.0f, rot, 0.0f));
 	EndModelRenderer();
 
 	BeginVoxelRenderer(voxel_render_context, camera_mat);
 	RenderVoxel(voxel_render_context, Vector3(0.0f, -0.5f, 0.0f), Vector3(100.0f, 1.0f, 50.0f), 0, 150, 0, 255);
-	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, rot, 0.0f), 255, 0, 0, 255);
+	RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, rot, 0.0f), 255, 0, 0, 255);
 	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), 255, 0, 0, 255);
 	EndVoxelRenderer();
+
 	BeginRenderer(render_context);
 	std::string p = "X: " + std::to_string(game->camera.position.x) + " Y: " + 
 		std::to_string(game->camera.position.y) + " Z: " + std::to_string(game->camera.position.z);

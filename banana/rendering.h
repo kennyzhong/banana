@@ -5,7 +5,7 @@
 #include "gl_util.h"
 #include "math.h"
 
-global_variable std::string font_text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.";
+global_variable std::string font_text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.:-";
 
 struct RenderContext
 {

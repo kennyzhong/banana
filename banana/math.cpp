@@ -398,25 +398,20 @@ Matrix4 Matrix4_scale(float x, float y, float z)
 
 Matrix4 Matrix4_lookat(Vector3 eye, Vector3 target, Vector3 up)
 {
-	Vector3 forward = target - eye;
-	Normalize(forward);
+	Vector3 f = target;
+	Normalize(f);
 
-	Vector3 side = Cross(forward, up);
-	Normalize(side);
-	up = Cross(side, forward);
+	Vector3 r = up;
+	Normalize(r);
+	r = Cross(r, f);
+
+	Vector3 u = Cross(f, r);
 
 	Matrix4 m = Matrix4_identity();
-	/*m.m00 = side.x; m.m01 = up.x; m.m02 = -forward.x;
-	m.m10 = side.y; m.m11 = up.y; m.m12 = -forward.y;
-	m.m20 = side.z; m.m21 = up.z; m.m22 = -forward.z;
-	m.m30 = -eye.x;
-	m.m31 = -eye.y;
-	m.m32 = -eye.z;*/
 
-	m.m00 = side.x;		m.m01 = side.y;		m.m02 = side.z;
+	m.m00 = r.x;		m.m01 = r.y;		m.m02 = r.z;
 	m.m10 = up.x,		m.m11 = up.y;		m.m12 = up.z;
-	m.m20 = -forward.x;	m.m21 = -forward.y;	m.m22 = -forward.z;
-	m.m30 = -eye.x;		m.m31 = -eye.y;		m.m32 = -eye.z;
+	m.m20 = -f.x;		m.m21 = -f.y;		m.m22 = -f.z;
 	return m;
 }
 
