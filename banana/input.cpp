@@ -66,3 +66,10 @@ bool IsMouseReleased(InputData *input, MouseButton button)
 			return true;
 	return false;
 }
+
+void SetMousePosition(InputData *input, Vector2 position)
+{
+	int w, h;
+	SDL_GetWindowSize(input->window, &w, &h);
+	SDL_WarpMouseInWindow(input->window, position.x*(float)w, position.y*(float)h);
+}

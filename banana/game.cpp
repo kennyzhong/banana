@@ -46,7 +46,7 @@ void CameraRotateX(Camera *camera, float angle)
 	Vector3 h_axis = Cross(y_axis, camera->forward);
 	Normalize(h_axis);
 
-	Rotate(camera->forward, angle, h_axis);
+	Rotate(camera->forward, angle, CameraRight(camera));
 	Normalize(camera->forward);
 
 	camera->up = Cross(camera->forward, h_axis);
@@ -54,7 +54,7 @@ void CameraRotateX(Camera *camera, float angle)
 }
 
 void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContext *render_context,
-	VoxelRenderContext *voxel_render_context, bool &paused, float delta)
+	VoxelRenderContext *voxel_render_context, WindowData *window_data, bool &paused, float delta)
 {
 	GameState *game = (GameState *)game_memory->memory;
 	if (!game->initialized)
@@ -112,6 +112,13 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		if (IsKeyPressed(input, "f9"))
 			game->render_aabbs = !game->render_aabbs;
 		
+		Vector2 center = Vector2((float)window_data->target_width*0.5f, (float)window_data->target_height*0.5f);
+
+		Vector2 mouse_delta = input->mouse_pos - center;
+
+		/*CameraRotateX(&game->camera, (mouse_delta.y) * 5 * delta);
+		CameraRotateY(&game->camera, (mouse_delta.x) * 5 * delta);*/
+
 		if (IsKeyDown(input, "right"))
 			CameraRotateY(&game->camera, 100 * delta);
 		if (IsKeyDown(input, "left"))
@@ -135,6 +142,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		if (IsKeyDown(input, "left"))
 			rot += 100.0f * delta;*/
 
+		SetMousePosition(input, Vector2(0.5f, 0.5f));
 	}
 	// Rendering
 	RenderClear(render_context, 50, 203, 255, 255, GL_DEPTH_BUFFER_BIT);
@@ -168,6 +176,11 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	std::string u = "X: " + std::to_string(game->camera.up.x) + " Y: " +
 		std::to_string(game->camera.up.y) + " Z: " + std::to_string(game->camera.up.z);
 	RenderString(render_context, 40.0f, 100.0f, u.c_str(), 0.0f);
+
+	Vector3 cross = Cross(y_axis, game->camera.forward);
+	std::string c = "X: " + std::to_string(cross.x) + " Y: " +
+		std::to_string(cross.y) + " Z: " + std::to_string(cross.z);
+	RenderString(render_context, 40.0f, 120.0f, c.c_str(), 0.0f);
 
 	EndRenderer();
 }

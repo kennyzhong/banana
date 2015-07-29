@@ -232,14 +232,14 @@ void Normalize(Vector3 &input)
 
 void Rotate(Vector3 &input, float angle, Vector3 axis)
 {
-	/*float sin_half_angle = (float)sinf(ToRadians(angle / 2));
-	float cos_half_angle = (float)cosf(ToRadians(angle / 2));
+	/*float sin_half_angle = (float)sinf(ToDegrees(angle / 2));
+	float cos_half_angle = (float)cosf(ToDegrees(angle / 2));
 
 	Quaternion rotation;
 	rotation.x = axis.x * sin_half_angle;
 	rotation.y = axis.y * sin_half_angle;
 	rotation.z = axis.z * sin_half_angle;
-	rotation.z = cos_half_angle;
+	rotation.w = cos_half_angle;
 
 	Quaternion conjugate = rotation;
 	Conjugate(conjugate);
@@ -248,13 +248,28 @@ void Rotate(Vector3 &input, float angle, Vector3 axis)
 
 	input.x = w.x;
 	input.y = w.y;
-	input.z = w.z;*/
+	input.z = w.z;
+	*/
 	// Todegrees seems to be turning to radians?? 
 	float sin_angle = (float)sinf(-ToDegrees(angle));
 	float cos_angle = (float)cosf(-ToDegrees(angle));
 
-	Vector3 r = Cross(input, axis * sin_angle) + (input * cos_angle) + (axis * Dot(input, axis * (1 - cos_angle)));
+	Vector3 r = Cross(input, axis * sin_angle) + // x
+		(input * cos_angle) +  // z
+		(axis * Dot(input, axis * (1 - cos_angle))); // y
 	input = r;
+}
+
+void Rotate(Vector3 &input, Quaternion quat)
+{
+	Quaternion conjugate = quat;
+	Conjugate(conjugate);
+
+	Quaternion w = quat * input * conjugate;
+
+	input.x = w.x;
+	input.y = w.y;
+	input.z = w.z;
 }
 
 Vector3 Cross(Vector3 a, Vector3 b)
@@ -452,7 +467,6 @@ void Conjugate(Quaternion &quat)
 	quat.x = -quat.x;
 	quat.y = -quat.y;
 	quat.z = -quat.z;
-	quat.w = -quat.w;
 }
 
 Quaternion Quaternion::operator*(const Quaternion &other)

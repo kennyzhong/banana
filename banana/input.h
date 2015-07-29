@@ -9,6 +9,7 @@
 typedef std::map<SDL_Scancode, bool> key_map;
 struct InputData
 {
+	SDL_Window *window;
 	Vector2 mouse_pos;
 	key_map keyboard_state;
 	key_map prev_keyboard_state;
@@ -38,5 +39,6 @@ bool IsMouseDown(InputData *input, MouseButton button);
 bool IsMouseUp(InputData *input, MouseButton button);
 bool IsMousePressed(InputData *input, MouseButton button);
 bool IsMouseReleased(InputData *input, MouseButton button);
+void SetMousePosition(InputData *input, Vector2 position);
 
 #endif // INPUT_H

@@ -59,19 +59,6 @@ internal void OutputSystemInfo()
 	}
 }
 
-struct WindowData
-{
-	int width;
-	int height;
-	int target_width;
-	int target_height;
-	int vp_x;
-	int vp_y;
-	int vp_width;
-	int vp_height;
-	bool fullscreen;
-};
-
 internal void ToggleFullScreen(SDL_Window *window, WindowData *window_data)
 {
 	if (window_data->fullscreen)
@@ -175,7 +162,7 @@ int main(int argc, char *args[])
 		SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
 	// ToggleFullScreen(window);
-	SDL_ShowCursor(SDL_ENABLE);
+	SDL_ShowCursor(SDL_DISABLE);
 	// OutputSystemInfo();
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	glewExperimental = GL_TRUE;
@@ -215,6 +202,7 @@ int main(int argc, char *args[])
 	InitializeVoxelContext(&voxel_render_context);
 
 	InputData input = { };
+	input.window = window;
 
 	UIContext ui_context = { 0 };
 	ui_context.input = &input;
@@ -293,7 +281,8 @@ int main(int argc, char *args[])
 
 		float32 delta = 1.0f / (float32)gameUpdateHz;
 
-		GameUpdateAndRender(&game_memory, &input, &render_context, &voxel_render_context, game_paused, delta);
+		GameUpdateAndRender(&game_memory, &input, &render_context, &voxel_render_context, 
+			&window_data, game_paused, delta);
 
 		uint64 workCounter = GetWallClock();
 		float32 workSecondsElapsed = GetSecondsElapsed(lastCounter, workCounter);

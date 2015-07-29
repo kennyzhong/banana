@@ -12,6 +12,19 @@ struct InputData;
 struct RenderContext;
 struct VoxelRenderContext;
 
+struct WindowData
+{
+	int width;
+	int height;
+	int target_width;
+	int target_height;
+	int vp_x;
+	int vp_y;
+	int vp_width;
+	int vp_height;
+	bool fullscreen;
+};
+
 struct GameMemory
 {
 	void *memory;
@@ -47,6 +60,6 @@ struct GameState
 };
 
 void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContext *render_context,
-	VoxelRenderContext *voxel_render_context, bool &paused, float delta);
+	VoxelRenderContext *voxel_render_context, WindowData *window, bool &paused, float delta);
 
 #endif // GAME_H

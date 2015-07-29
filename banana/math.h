@@ -1,6 +1,8 @@
 #ifndef MATH_H
 #define MATH_H
 
+struct Quaternion;
+
 struct Vector2
 {
 	Vector2(float x, float y) : x(x), y(y) {};
@@ -68,6 +70,7 @@ struct Vector3
 float Length(Vector3 input);
 void Normalize(Vector3 &input);
 void Rotate(Vector3 &input, float angle, Vector3 axis);
+void Rotate(Vector3 &input, Quaternion quat);
 Vector3 Cross(Vector3 a, Vector3 b);
 float Dot(Vector3 a, Vector3 b);
 
@@ -110,6 +113,16 @@ struct Quaternion
 {
 	Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {};
 	Quaternion() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {};
+	Quaternion(float angle, Vector3 axis)
+	{
+		float sin_half_angle = (float)sinf(ToDegrees(angle / 2));
+		float cos_half_angle = (float)cosf(ToDegrees(angle / 2));
+
+		x = axis.x * sin_half_angle;
+		y = axis.y * sin_half_angle;
+		z = axis.z * sin_half_angle;
+		w = cos_half_angle;
+	}
 
 	float x, y, z, w;
 
