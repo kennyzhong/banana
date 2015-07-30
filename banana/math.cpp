@@ -232,32 +232,7 @@ void Normalize(Vector3 &input)
 
 void Rotate(Vector3 &input, float angle, Vector3 axis)
 {
-	/*float sin_half_angle = (float)sinf(ToDegrees(angle / 2));
-	float cos_half_angle = (float)cosf(ToDegrees(angle / 2));
-
-	Quaternion rotation;
-	rotation.x = axis.x * sin_half_angle;
-	rotation.y = axis.y * sin_half_angle;
-	rotation.z = axis.z * sin_half_angle;
-	rotation.w = cos_half_angle;
-
-	Quaternion conjugate = rotation;
-	Conjugate(conjugate);
-
-	Quaternion w = (rotation * input) * conjugate;
-
-	input.x = w.x;
-	input.y = w.y;
-	input.z = w.z;
-	*/
-	// Todegrees seems to be turning to radians?? 
-	float sin_angle = (float)sinf(-ToDegrees(angle));
-	float cos_angle = (float)cosf(-ToDegrees(angle));
-
-	Vector3 r = Cross(input, axis * sin_angle) + // x
-		(input * cos_angle) +  // z
-		(axis * Dot(input, axis * (1 - cos_angle))); // y
-	input = r;
+	Rotate(input, Quaternion(angle, axis));
 }
 
 void Rotate(Vector3 &input, Quaternion quat)
@@ -402,6 +377,17 @@ Matrix4 Matrix4_rotate(float angle, float x, float y, float z)
 	return m;
 }
 
+Matrix4 Matrix4_rotate(Quaternion quat)
+{
+	Vector3 forward = Vector3(2.0f * (quat.x * quat.z - quat.w * quat.y), 2.0f *
+		(quat.y * quat.z + quat.w * quat.x), 1.0f - 2.0f * (quat.x * quat.x + quat.y * quat.y));
+	Vector3 up = Vector3(2.0f * (quat.x * quat.y + quat.w * quat.z), 1.0f - 2.0f *
+		(quat.x * quat.x + quat.z * quat.z), 2.0f * (quat.y * quat.z - quat.w * quat.x));
+	Vector3 right = Vector3(1.0f - 2.0f * (quat.y * quat.y + quat.z * quat.z), 2.0f * 
+		(quat.x * quat.y - quat.w * quat.z), 2.0f * (quat.x * quat.z + quat.w * quat.y));
+	return Matrix4_lookat(forward, up, right);
+}
+
 Matrix4 Matrix4_scale(float x, float y, float z)
 {
 	Matrix4 m = Matrix4_identity();
@@ -411,17 +397,9 @@ Matrix4 Matrix4_scale(float x, float y, float z)
 	return m;
 }
 
-Matrix4 Matrix4_lookat(Vector3 eye, Vector3 target, Vector3 up)
+Matrix4 Matrix4_lookat(Vector3 f, Vector3 up, Vector3 r)
 {
-	Vector3 f = target;
-	Normalize(f);
-
-	Vector3 r = up;
-	Normalize(r);
-	r = Cross(r, f);
-
-	Vector3 u = Cross(f, r);
-
+	
 	Matrix4 m = Matrix4_identity();
 
 	m.m00 = r.x;		m.m01 = r.y;		m.m02 = r.z;
@@ -486,9 +464,37 @@ Quaternion Quaternion::operator*(const Vector3 &other)
 	Quaternion result;
 
 	result.w = -x * other.x - y * other.y - z * other.z;
-	result.x =	w * other.x + y * other.z - z * other.y;
-	result.y =	w * other.y + z * other.x - x * other.z;
-	result.z =	w * other.z + x * other.y - y * other.x;
+	result.x = w * other.x + y * other.z - z * other.y;
+	result.y = w * other.y + z * other.x - x * other.z;
+	result.z = w * other.z + x * other.y - y * other.x;
 
+	return result;
+}
+
+Vector3 GetForward(Quaternion quat)
+{
+	Vector3 result = Vector3(0.0f, 0.0f, 1.0f);
+	Rotate(result, quat);
+	return result;
+}
+
+Vector3 GetBackward(Quaternion quat)
+{
+	Vector3 result = Vector3(0.0f, 0.0f, -1.0f);
+	Rotate(result, quat);
+	return result;
+}
+
+Vector3 GetRight(Quaternion quat)
+{
+	Vector3 result = Vector3(1.0f, 0.0f, 0.0f);
+	Rotate(result, quat);
+	return result;
+}
+
+Vector3 GetLeft(Quaternion quat)
+{
+	Vector3 result = Vector3(-1.0f, 0.0f, 0.0f);
+	Rotate(result, quat);
 	return result;
 }

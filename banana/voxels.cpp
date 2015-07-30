@@ -195,12 +195,12 @@ void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera)
 	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 }
 
 void EndModelRenderer()
 {
-	glCullFace(GL_BACK);
+	
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glUseProgram(0);
@@ -277,18 +277,23 @@ void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_mod
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 }
 
-void RenderModel(VoxelRenderContext *context, Model *model, Vector3 position, Vector3 scale,
-	Vector3 rotation)
+void RenderModel(VoxelRenderContext *context, Model *model, Matrix4 transform)
 {
 	//printOpenGLError();
 	glBindVertexArray(model->vao);
 	glUniform1i(context->instanced_loc, 1);
+	glUniformMatrix4fv(context->world_loc, 1, GL_FALSE, &transform.data[0]);
+	glDrawElementsInstanced(GL_TRIANGLES, context->v_count, GL_UNSIGNED_INT, 0, model->voxel_num);
+	glUniform1i(context->instanced_loc, 0);
+}
+
+void RenderModel(VoxelRenderContext *context, Model *model, Vector3 position, Vector3 scale,
+	Vector3 rotation)
+{
 	Matrix4 world = Matrix4_scale(scale.x, scale.y, scale.z)
 		* Matrix4_rotate(rotation.z, 0.0f, 0.0f, 1.0f)
 		* Matrix4_rotate(rotation.y, 0.0f, 1.0f, 0.0f)
 		* Matrix4_rotate(rotation.x, 1.0f, 0.0f, 0.0f)
 		* Matrix4_translate(position.x, position.y, position.z);
-	glUniformMatrix4fv(context->world_loc, 1, GL_FALSE, &world.data[0]);
-	glDrawElementsInstanced(GL_TRIANGLES, context->v_count, GL_UNSIGNED_INT, 0, model->voxel_num);
-	glUniform1i(context->instanced_loc, 0);
+	RenderModel(context, model, world);
 }

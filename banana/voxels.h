@@ -49,6 +49,7 @@ struct Model
 void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera);
 void EndModelRenderer();
 void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_model);
+void RenderModel(VoxelRenderContext *context, Model *model, Matrix4 transform);
 void RenderModel(VoxelRenderContext *context, Model *model, Vector3 position, Vector3 scale,
 	Vector3 rotation);
 

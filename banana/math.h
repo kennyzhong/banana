@@ -102,8 +102,9 @@ Matrix4 Matrix4_frustum(float left, float right, float bottom, float top, float 
 Matrix4 Matrix4_perspective(float fovy, float aspect, float znear, float zfar);
 Matrix4 Matrix4_translate(float x, float y, float z);
 Matrix4 Matrix4_rotate(float angle, float x, float y, float z);
+Matrix4 Matrix4_rotate(Quaternion quat);
 Matrix4 Matrix4_scale(float x, float y, float z);
-Matrix4 Matrix4_lookat(Vector3 eye, Vector3 target, Vector3 up);
+Matrix4 Matrix4_lookat(Vector3 forward, Vector3 up, Vector3 right);
 
 float ToDegrees(float radians);
 float ToRadians(float degrees);
@@ -112,7 +113,7 @@ float Clamp(float input, float min, float max);
 struct Quaternion
 {
 	Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {};
-	Quaternion() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {};
+	Quaternion() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) {};
 	Quaternion(float angle, Vector3 axis)
 	{
 		float sin_half_angle = (float)sinf(ToDegrees(angle / 2));
@@ -133,5 +134,9 @@ struct Quaternion
 float Length(Quaternion quat);
 void Normalize(Quaternion &quat);
 void Conjugate(Quaternion &quat);
+Vector3 GetForward(Quaternion quat);
+Vector3 GetBackward(Quaternion quat);
+Vector3 GetRight(Quaternion quat);
+Vector3 GetLeft(Quaternion quat);
 
 #endif // MATH_H

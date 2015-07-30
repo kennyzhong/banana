@@ -23,6 +23,7 @@ struct WindowData
 	int vp_width;
 	int vp_height;
 	bool fullscreen;
+	bool vsync = false;
 };
 
 struct GameMemory
@@ -37,8 +38,7 @@ struct GameMemory
 struct Camera
 {
 	Vector3 position;
-	Vector3 forward;
-	Vector3 up;
+	Quaternion rotation;
 };
 
 struct GameState
@@ -49,10 +49,11 @@ struct GameState
 	uint32 player;
 	GLint color_change_loc;
 	Texture paul;
-	MV_Model mv_model;
 	Model model;
-	MV_Model mv_maze;
 	Model maze;
+	Model sword;
+	Model gimble;
+	Quaternion quat;
 
 	Camera camera;
 

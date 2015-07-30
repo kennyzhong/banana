@@ -13,6 +13,7 @@ uniform mat4 projection;
 uniform mat4 camera;
 uniform mat4 world;
 uniform int instanced;
+uniform vec3 light_direction;
 
 void main()
 {

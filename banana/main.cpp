@@ -139,7 +139,7 @@ int main(int argc, char *args[])
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	// NOTE(nathan): This also initializes the window_with and window_height
-	WindowData window_data = { 0 };
+	WindowData window_data = { };
 	window_data.target_width = 1920;
 	window_data.target_height = 1080;
 
@@ -169,7 +169,7 @@ int main(int argc, char *args[])
 	if (glewInit() != GLEW_OK) Error("glewInit");
 
 	// Goes stuttery if we turn on vsync
-	SDL_GL_SetSwapInterval(0);
+	SDL_GL_SetSwapInterval((int)window_data.vsync);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
@@ -231,6 +231,8 @@ int main(int argc, char *args[])
 				input.keyboard_state[key] = true;
 				if (key == SDL_SCANCODE_ESCAPE)
 					running = false;
+				if (key == SDL_SCANCODE_F12)
+					window_data.vsync = !window_data.vsync;
 				if (key == SDL_SCANCODE_F11)
 					ToggleFullScreen(window, &window_data);
 				if (key == SDL_SCANCODE_F10)
@@ -313,8 +315,9 @@ int main(int argc, char *args[])
 		// Debug Render
 		BeginRenderer(&render_context);
 
-		std::string s = "FRAMETIME " + std::to_string(msPerFrame);
+		std::string s = "FRAMETIME " + std::to_string(msPerFrame) + " VSYNC " + std::to_string(window_data.vsync);
 		RenderString(&render_context, 40.0f, 40.0f, s.c_str(), 0.0f);
+
 
 		EndRenderer();
 
