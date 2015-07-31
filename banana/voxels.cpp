@@ -100,19 +100,16 @@ void InitializeVoxelContext(VoxelRenderContext *context)
 	glGenBuffers(1, &context->vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, context->vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(Vector3), vertices, GL_STATIC_DRAW);
-	GLint pos = glGetAttribLocation(context->diffuse.program, "position");
+	GLint pos = context->diffuse.attributes["position"];
 	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
 	glEnableVertexAttribArray(pos);
 
 	glGenBuffers(1, &context->nbo);
 	glBindBuffer(GL_ARRAY_BUFFER, context->nbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(normals) * sizeof(Vector3), normals, GL_STATIC_DRAW);
-	GLint n = glGetAttribLocation(context->diffuse.program, "normal");
+	GLint n = context->diffuse.attributes["normal"];
 	glVertexAttribPointer(n, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
 	glEnableVertexAttribArray(n);
-
-
-	
 
 	context->v_count = sizeof(elements);
 
@@ -120,17 +117,9 @@ void InitializeVoxelContext(VoxelRenderContext *context)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, context->ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-	context->color_loc = glGetUniformLocation(context->diffuse.program, "color");
-	context->world_loc = glGetUniformLocation(context->diffuse.program, "world");
-	context->camera_loc = glGetUniformLocation(context->diffuse.program, "camera");
-	context->instanced_loc = glGetUniformLocation(context->diffuse.program, "instanced");
-
 	// Camera shit
-	BindShader(&context->diffuse);
 	Matrix4 projection = Matrix4_perspective(90.0f, 1920.0f/1080.0f, 0.01f, 1000.0f);
-	glUniformMatrix4fv(glGetUniformLocation(context->diffuse.program, "projection"),
-		1, GL_FALSE, &projection.data[0]);
-	glUseProgram(0);
+	SetShaderUniform(&context->diffuse, "projection", projection);
 
 }
 
@@ -145,11 +134,11 @@ void UnloadVoxelContext(VoxelRenderContext *context)
 void BeginVoxelRenderer(VoxelRenderContext *context, Matrix4 camera)
 {
 	glBindVertexArray(context->vao);
-	BindShader(&context->diffuse);
-	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 	glCullFace(GL_FRONT);
+	BindShader(&context->diffuse);
+	SetShaderUniform(&context->diffuse, "camera", camera);
 }
 
 void EndVoxelRenderer()
@@ -174,14 +163,14 @@ void RenderVoxel(VoxelRenderContext *context, Vector3 position, Vector3 scale,
 	float32 gg = (1.0f / 255.0f)*(float32)g;
 	float32 bb = (1.0f / 255.0f)*(float32)b;
 	float32 aa = (1.0f / 255.0f)*(float32)a;
-	glUniform1i(context->instanced_loc, 0);
-	glUniform4f(context->color_loc, rr, gg, bb, aa);
+	SetShaderUniform(&context->diffuse, "instanced", 0);
+	SetShaderUniform(&context->diffuse, "color", rr, gg, bb, aa);
 	Matrix4 world = Matrix4_scale(scale.x, scale.y, scale.z) 
 		* Matrix4_rotate(rotation.z, 0.0f, 0.0f, 1.0f)
 		* Matrix4_rotate(rotation.y, 0.0f, 1.0f, 0.0f)
 		* Matrix4_rotate(rotation.x, 1.0f, 0.0f, 0.0f)
 		* Matrix4_translate(position.x, position.y, position.z);
-	glUniformMatrix4fv(context->world_loc, 1, GL_FALSE, &world.data[0]);
+	SetShaderUniform(&context->diffuse, "world", world);
 	GLenum mode = GL_TRIANGLES;
 	if (outline) mode = GL_LINE_LOOP;
 	glDrawElements(mode, context->v_count, GL_UNSIGNED_INT, 0);
@@ -191,8 +180,7 @@ void RenderVoxel(VoxelRenderContext *context, Vector3 position, Vector3 scale,
 
 void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera)
 {
-	BindShader(&context->diffuse);
-	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
+	SetShaderUniform(&context->diffuse, "camera", camera);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 	glCullFace(GL_BACK);
@@ -234,7 +222,7 @@ void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_mod
 	glBindBuffer(GL_ARRAY_BUFFER, model->tbo);
 	glBufferData(GL_ARRAY_BUFFER, transforms.size() * sizeof(Matrix4), &transforms.front(), GL_STATIC_DRAW);
 
-	GLint t = glGetAttribLocation(context->diffuse.program, "world_instanced");
+	GLint t = context->diffuse.attributes["world_instanced"];
 	for (uint32 i = 0; i < 4; i++)
 	{
 		glVertexAttribPointer(t + i, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4),
@@ -246,7 +234,7 @@ void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_mod
 	glGenBuffers(1, &model->cbo);
 	glBindBuffer(GL_ARRAY_BUFFER, model->cbo);
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(Vector3), &colors.front(), GL_STATIC_DRAW);
-	GLint c = glGetAttribLocation(context->diffuse.program, "color_instanced");
+	GLint c = context->diffuse.attributes["color_instanced"];
 	glVertexAttribPointer(c, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
 	glEnableVertexAttribArray(c);
 	glVertexAttribDivisor(c, 1);
@@ -254,7 +242,7 @@ void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_mod
 	glGenBuffers(1, &model->vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, model->vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(Vector3), vertices, GL_STATIC_DRAW);
-	GLint pos = glGetAttribLocation(context->diffuse.program, "position");
+	GLint pos = context->diffuse.attributes["position"];
 
 	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
 	glEnableVertexAttribArray(pos);
@@ -262,7 +250,7 @@ void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_mod
 	glGenBuffers(1, &model->nbo);
 	glBindBuffer(GL_ARRAY_BUFFER, model->nbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(normals) * sizeof(Vector3), normals, GL_STATIC_DRAW);
-	GLuint n = glGetAttribLocation(context->diffuse.program, "normal");
+	GLuint n = context->diffuse.attributes["normal"];
 	glVertexAttribPointer(n, 3, GL_FLOAT, GL_FALSE,
 		sizeof(Vector3), 0);
 	glEnableVertexAttribArray(n);
@@ -281,10 +269,10 @@ void RenderModel(VoxelRenderContext *context, Model *model, Matrix4 transform)
 {
 	//printOpenGLError();
 	glBindVertexArray(model->vao);
-	glUniform1i(context->instanced_loc, 1);
-	glUniformMatrix4fv(context->world_loc, 1, GL_FALSE, &transform.data[0]);
+	SetShaderUniform(&context->diffuse, "instanced", 1);
+	SetShaderUniform(&context->diffuse, "world", transform);
 	glDrawElementsInstanced(GL_TRIANGLES, context->v_count, GL_UNSIGNED_INT, 0, model->voxel_num);
-	glUniform1i(context->instanced_loc, 0);
+	SetShaderUniform(&context->diffuse, "instanced", 0);
 }
 
 void RenderModel(VoxelRenderContext *context, Model *model, Vector3 position, Vector3 scale,

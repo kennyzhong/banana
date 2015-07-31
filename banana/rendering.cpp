@@ -17,8 +17,8 @@ void InitializeContext(RenderContext *context)
 	glGenVertexArrays(1, &context->vao);
 	glBindVertexArray(context->vao);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(float), vertices, GL_STATIC_DRAW);
-	GLint pos = glGetAttribLocation(context->diffuse.program, "position");
-	GLint tex = glGetAttribLocation(context->diffuse.program, "tex_coord");
+	GLint pos = context->diffuse.attributes["position"];
+	GLint tex = context->diffuse.attributes["tex_coord"];
 
 	glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	glEnableVertexAttribArray(pos);
@@ -35,18 +35,9 @@ void InitializeContext(RenderContext *context)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, context->ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-	context->color_loc = glGetUniformLocation(context->diffuse.program, "color");
-	context->world_loc = glGetUniformLocation(context->diffuse.program, "world");
-	context->camera_loc = glGetUniformLocation(context->diffuse.program, "camera");
-	context->using_tex_loc = glGetUniformLocation(context->diffuse.program, "using_tex");
-	context->tex_offset_loc = glGetUniformLocation(context->diffuse.program, "tex_offset");
-
 	// Camera shit
-	BindShader(&context->diffuse);
 	Matrix4 projection = Matrix4_ortho(0.0f, 1920.0f, 0.0f, 1080.0f, -1.0f, 1.0f);
-	glUniformMatrix4fv(glGetUniformLocation(context->diffuse.program, "projection"),
-		1, GL_FALSE, &projection.data[0]);
-	glUseProgram(0);
+	SetShaderUniform(&context->diffuse, "projection", projection);
 
 	context->font = LoadTexture("assets/font.png", GL_LINEAR);
 
@@ -77,8 +68,7 @@ void BeginRenderer(RenderContext *context, Matrix4 camera)
 	glBindBuffer(GL_ARRAY_BUFFER, context->vbo);
 	glBindVertexArray(context->vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, context->ebo);
-	BindShader(&context->diffuse);
-	glUniformMatrix4fv(context->camera_loc, 1, GL_FALSE, &camera.data[0]);
+	SetShaderUniform(&context->diffuse, "camera", camera);
 }
 
 void EndRenderer()
@@ -98,16 +88,16 @@ void RenderSquare(RenderContext *context, float x, float y, float w, float h,
 void RenderSquare(RenderContext *context, float x, float y, float w, float h,
 	float rotation, uint8 r, uint8 g, uint8 b, uint8 a, bool outline)
 {
-	glUniform1i(context->using_tex_loc, 0);
+	SetShaderUniform(&context->diffuse, "using_tex", 0);
 	float32 rr = (1.0f / 255.0f)*(float32)r;
 	float32 gg = (1.0f / 255.0f)*(float32)g;
 	float32 bb = (1.0f / 255.0f)*(float32)b;
 	float32 aa = (1.0f / 255.0f)*(float32)a;
 
-	glUniform4f(context->color_loc, rr, gg, bb, aa);
+	SetShaderUniform(&context->diffuse, "color", rr, gg, bb, aa);
 	Matrix4 world = Matrix4_scale(w, h, 1.0f) * Matrix4_rotate(rotation, 0.0f, 0.0f, 1.0f)
 		* Matrix4_translate(x, y, 0.0f);
-	glUniformMatrix4fv(context->world_loc, 1, GL_FALSE, &world.data[0]);
+	SetShaderUniform(&context->diffuse, "world", world);
 	GLenum mode = GL_TRIANGLES;
 	if (outline) mode = GL_LINE_LOOP;
 	glDrawElements(mode, 6, GL_UNSIGNED_INT, 0);
@@ -138,7 +128,7 @@ void RenderTexture(RenderContext *context, float x, float y, float rotation, Tex
 	float32 bb = (1.0f / 255.0f)*(float32)b;
 	float32 aa = (1.0f / 255.0f)*(float32)a;
 
-	glUniform4f(context->color_loc, rr, gg, bb, aa);
+	SetShaderUniform(&context->diffuse, "color", rr, gg, bb, aa);
 
 	float scale_x = width / (float)texture->width;
 	float scale_y = height / (float)texture->height;
@@ -146,9 +136,9 @@ void RenderTexture(RenderContext *context, float x, float y, float rotation, Tex
 		Matrix4_translate(
 		(1.0f / (float)texture->width)*offset_x, 
 		(1.0f / (float)texture->height)*offset_y, 0.0f);
-	glUniformMatrix4fv(context->tex_offset_loc, 1, GL_FALSE, &tex_offset.data[0]);
+	SetShaderUniform(&context->diffuse, "tex_offset", tex_offset);
 	
-	glUniform1i(context->using_tex_loc, 1);
+	SetShaderUniform(&context->diffuse, "using_tex", 1);
 	if (context->bound_texture != texture)
 	{
 		glActiveTexture(GL_TEXTURE0);
@@ -157,7 +147,7 @@ void RenderTexture(RenderContext *context, float x, float y, float rotation, Tex
 	}
 	Matrix4 world = Matrix4_scale(width, height, 1.0f) * Matrix4_rotate(rotation, 0.0f, 0.0f, 1.0f)
 		* Matrix4_translate(x, y, 0.0f);
-	glUniformMatrix4fv(context->world_loc, 1, GL_FALSE, &world.data[0]);
+	SetShaderUniform(&context->diffuse, "world", world);
 
 	// This isnt causing much lag?? must be the matrix math - got to do simd?? time to learn I guess?
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

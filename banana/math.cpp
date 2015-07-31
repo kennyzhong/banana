@@ -498,3 +498,17 @@ Vector3 GetLeft(Quaternion quat)
 	Rotate(result, quat);
 	return result;
 }
+
+Vector3 GetUp(Quaternion quat)
+{
+	Vector3 result = Vector3(0.0f, 1.0f, 0.0f);
+	Rotate(result, quat);
+	return result;
+}
+
+Vector3 GetDown(Quaternion quat)
+{
+	Vector3 result = Vector3(0.0f, -1.0f, 0.0f);
+	Rotate(result, quat);
+	return result;
+}

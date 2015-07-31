@@ -17,14 +17,6 @@ void MoveCamera(Camera *camera, Vector3 dir, float amount)
 
 void CameraRotateY(Camera *camera, float angle)
 {
-	/*Vector3 h_axis = Cross(y_axis, camera->forward);
-	Normalize(h_axis);
-
-	Rotate(camera->forward, angle, y_axis);
-	Normalize(camera->forward);
-
-	camera->up = Cross(camera->forward, h_axis);
-	Normalize(camera->up);*/
 	Quaternion n = Quaternion(angle, y_axis) * camera->rotation;
 	Normalize(n);
 	camera->rotation = n;
@@ -32,14 +24,6 @@ void CameraRotateY(Camera *camera, float angle)
 
 void CameraRotateX(Camera *camera, float angle)
 {
-	/*Vector3 h_axis = Cross(y_axis, camera->forward);
-	Normalize(h_axis);
-
-	Rotate(camera->forward, angle, h_axis);
-	Normalize(camera->forward);
-
-	camera->up = Cross(camera->forward, h_axis);
-	Normalize(camera->up);*/
 	Quaternion n = Quaternion(angle, GetRight(camera->rotation)) * camera->rotation;
 	Normalize(n);
 	camera->rotation = n;
@@ -94,19 +78,8 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 				AABBUpdate(&game->world, entity);
 			if (HasComponent(&game->world, entity, COMPONENT_TRANSFORM))
 				TransformUpdate(&game->world, entity);
-		}
+		}*/
 		
-		Vector2 position = game->world.transforms[game->player].position;
-		Vector2 target;*/
-		//game->camera_pos.x = position.x - (1920.0f / game->camera_scale)*0.5f;
-		//game->camera_pos.y = position.y - (1080.0f / game->camera_scale)*0.5f;
-		/*game->camera_pos.x = position.x - 300.0f;
-		game->camera_pos.y = position.y - 300.0f;*/
-		//target.x;
-		//target.y;
-		//game->camera_pos.x += ((target.x - game->camera_pos.x) * 100 * delta);
-		//game->camera_pos.y += ((target.y - game->camera_pos.y) * 100 * delta);
-
 		if (IsKeyPressed(input, "f9"))
 			game->render_aabbs = !game->render_aabbs;
 		
@@ -126,14 +99,19 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		if (IsKeyDown(input, "down"))
 			CameraRotateX(&game->camera, -100.0f * delta);
 
+
 		if (IsKeyDown(input, "w"))
-			MoveCamera(&game->camera, GetForward(game->camera.rotation), 10 * delta);
+			MoveCamera(&game->camera, Vector3(0.0f, 0.0f, 1.0f), 10 * delta);
 		if (IsKeyDown(input, "s"))
-			MoveCamera(&game->camera, GetBackward(game->camera.rotation), 10 * delta);
+			MoveCamera(&game->camera, GetForward(game->camera.rotation), -10 * delta);
 		if (IsKeyDown(input, "a"))
 			MoveCamera(&game->camera, GetLeft(game->camera.rotation), 10 * delta);
 		if (IsKeyDown(input, "d"))
 			MoveCamera(&game->camera, GetRight(game->camera.rotation), 10 * delta);
+		if (IsKeyDown(input, "left shift"))
+			MoveCamera(&game->camera, y_axis, -10 * delta);
+		if (IsKeyDown(input, "space"))
+			MoveCamera(&game->camera, y_axis, 10 * delta);
 
 		/*if (IsKeyDown(input, "right"))
 			rot -= 100.0f * delta;
@@ -151,16 +129,18 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		-game->camera.position.z) * Matrix4_rotate(game->camera.rotation);
 
 	BeginModelRenderer(voxel_render_context, camera_mat);
-	glUniform3f(glGetUniformLocation(voxel_render_context->diffuse.program, "light_direction"),
-		-1.0f, -1.0f, 1.0f);
+	SetShaderUniform(&voxel_render_context->diffuse, "light_direction", Vector3(-1.0f, -1.0f, 1.0f));
 	RenderModel(voxel_render_context, &game->model, Matrix4_scale(1.0f, 1.0f, 1.0f) * 
 		Matrix4_rotate(game->quat) * Matrix4_translate(10.0f, (game->model.size.y * 0.5f), 0.0f));
 	EndModelRenderer();
 
 	BeginVoxelRenderer(voxel_render_context, camera_mat);
 	RenderVoxel(voxel_render_context, Vector3(0.0f, -0.5f, 0.0f), Vector3(300.0f, 1.0f, 150.0f), 0, 150, 0, 255);
-	RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, rot, 0.0f), 255, 0, 0, 255);
+	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, rot, 0.0f), 255, 0, 0, 255);
 	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), 255, 0, 0, 255);
+
+	RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f)
+		+ (GetForward(game->camera.rotation) * 10), 255, 0, 0, 255);
 	EndVoxelRenderer();
 
 	BeginRenderer(render_context);
@@ -176,7 +156,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		std::to_string(game->camera.up.y) + " Z: " + std::to_string(game->camera.up.z);
 	RenderString(render_context, 40.0f, 100.0f, u.c_str(), 0.0f);
 	*/
-	Vector3 cross = GetForward(game->camera.rotation);
+	Vector3 cross = GetRight(game->camera.rotation);
 	std::string c = "X: " + std::to_string(cross.x) + " Y: " +
 		std::to_string(cross.y) + " Z: " + std::to_string(cross.z);
 	RenderString(render_context, 40.0f, 120.0f, c.c_str(), 0.0f);

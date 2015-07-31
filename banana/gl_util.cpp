@@ -1,5 +1,7 @@
 #include "gl_util.h"
 
+GLuint Shader::bound_program = NULL;
+
 internal void CheckShaderError(GLuint shader, GLuint flag, bool is_program, const char *error_message)
 {
 	GLint success = 0;
@@ -59,10 +61,11 @@ internal char * FileToBuf(char *file)
 	return 0;
 }
 
+#include <vector>
 
 Shader CreateShader(char *filename_vertex, char *filename_fragment)
 {
-	Shader shader = { 0 };
+	Shader shader = { };
 
 	char *vertex_source = FileToBuf(filename_vertex);
 	char *fragment_source = FileToBuf(filename_fragment);
@@ -79,9 +82,38 @@ Shader CreateShader(char *filename_vertex, char *filename_fragment)
 	glValidateProgram(shader.program);
 	CheckShaderError(shader.program, GL_VALIDATE_STATUS, true, "Program validation failed: ");
 
+	// Cache Uniforms
+	GLint num_uniforms = 0;
+	glGetProgramInterfaceiv(shader.program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &num_uniforms);
+	const GLenum properties[4] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION };
+	for (int unif = 0; unif < num_uniforms; ++unif)
+	{
+		GLint values[4];
+		glGetProgramResourceiv(shader.program, GL_UNIFORM, unif, 4, properties, 4, 0, values);
+		if (values[0] != -1)
+			continue;
+		std::vector<char> name_data(values[2]);
+		glGetProgramResourceName(shader.program, GL_UNIFORM, unif, name_data.size(), 0, &name_data[0]);
+		std::string name(name_data.begin(), name_data.end() - 1);
+		shader.uniforms[name] = values[3];
+	}
+
+	// Cache attributes
+	GLint num_attributes = 0;
+	glGetProgramiv(shader.program, GL_ACTIVE_ATTRIBUTES, &num_attributes);
+	for (int i = 0; i < num_attributes; ++i)
+	{
+		int length, size;
+		GLenum type;
+		char buffer[128];
+		glGetActiveAttrib(shader.program, i, sizeof(buffer), &length, &size, &type, buffer);
+		std::string name(buffer, length);
+		shader.attributes[name] = glGetAttribLocation(shader.program, name.c_str());
+	}
+
 	SDL_free(vertex_source);
 	SDL_free(fragment_source);
-
+	
 	return shader;
 }
 
@@ -94,7 +126,45 @@ void DestroyShader(Shader *shader)
 
 void BindShader(Shader *shader)
 {
-	glUseProgram(shader->program);
+	
+		glUseProgram(shader->program);
+}
+
+void SetShaderUniform(Shader *shader, char *name, Matrix4 mat)
+{
+	BindShader(shader);
+	glUniformMatrix4fv(glGetUniformLocation(shader->program, name), 1, GL_FALSE, &mat.data[0]);
+}
+
+void SetShaderUniform(Shader *shader, char *name, Vector2 vec)
+{
+	BindShader(shader);
+	glUniform2f(shader->uniforms[name], vec.x, vec.y);
+	
+}
+
+void SetShaderUniform(Shader *shader, char *name, Vector3 vec)
+{
+	BindShader(shader);
+	glUniform3f(shader->uniforms[name], vec.x, vec.y, vec.z);
+}
+
+void SetShaderUniform(Shader *shader, char *name, float f)
+{
+	BindShader(shader);
+	glUniform1f(shader->uniforms[name], f);
+}
+
+void SetShaderUniform(Shader *shader, char *name, float a, float b, float c, float d)
+{
+	BindShader(shader);
+	glUniform4f(shader->uniforms[name], a, b, c, d);
+}
+
+void SetShaderUniform(Shader *shader, char *name, int i)
+{
+	BindShader(shader);
+	glUniform1i(shader->uniforms[name], i);
 }
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -125,37 +195,3 @@ void UnloadTexture(Texture *texture)
 	glDeleteTextures(1, &texture->id);
 }
 
-#include "math.h"
-
-void InitializeInstancedMap(InstancedMap *map, const void *transforms, const void *tex_offsets,
-	Shader *shader, int instance_num)
-{
-	map->transforms = transforms;
-	map->tex_offsets = tex_offsets;
-	map->instance_num = instance_num;
-	map->shader = shader;
-	float v = 0.5f;
-	Vector2 vertices[] =
-	{
-		Vector2(-v, v), Vector2(0.0f, 1.0f),
-		Vector2(v, v), Vector2(1.0f, 1.0f),
-		Vector2(v, -v), Vector2(1.0f, 0.0f),
-		Vector2(-v, -v), Vector2(0.0f, 0.0f)
-	};
-
-	glGenVertexArrays(1, &map->vao);
-	glBindVertexArray(map->vao);
-}
-
-void RenderInstancedMap(InstancedMap *map, Texture *texture, Matrix4 transform)
-{
-	BindShader(map->shader);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture->id);
-	glBindVertexArray(map->vao);
-	glBindBuffer(GL_ARRAY_BUFFER, map->vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, map->ebo);
-	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, map->instance_num);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glUseProgram(0);
-}

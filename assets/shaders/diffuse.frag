@@ -2,7 +2,9 @@
 
 in vec2 tex_coord0;
 in int id;
+
 out vec4 gl_FragColor;
+
 uniform vec4 color;
 uniform sampler2D tex;
 uniform int using_tex;

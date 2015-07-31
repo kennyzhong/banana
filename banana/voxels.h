@@ -11,10 +11,6 @@ struct VoxelRenderContext
 	GLuint vao;
 	GLuint nbo;
 	GLuint ebo;
-	GLint color_loc;
-	GLint camera_loc;
-	GLint world_loc;
-	GLint instanced_loc;
 	Shader diffuse;
 	int v_count;
 };

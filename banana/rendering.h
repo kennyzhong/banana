@@ -12,11 +12,6 @@ struct RenderContext
 	GLuint vbo;
 	GLuint vao;
 	GLuint ebo;
-	GLint color_loc;
-	GLint camera_loc;
-	GLint world_loc;
-	GLint using_tex_loc;
-	GLint tex_offset_loc;
 	Shader diffuse;
 	Texture *bound_texture;
 	Texture font;

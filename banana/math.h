@@ -138,5 +138,7 @@ Vector3 GetForward(Quaternion quat);
 Vector3 GetBackward(Quaternion quat);
 Vector3 GetRight(Quaternion quat);
 Vector3 GetLeft(Quaternion quat);
+Vector3 GetUp(Quaternion quat);
+Vector3 GetDown(Quaternion quat);
 
 #endif // MATH_H
