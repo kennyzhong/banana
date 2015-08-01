@@ -110,7 +110,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 			MoveCamera(&game->camera, GetLeft(game->camera.rotation), 10 * delta);
 		if (IsKeyDown(input, "d"))
 			MoveCamera(&game->camera, GetRight(game->camera.rotation), 10 * delta);
-		if (IsKeyDown(input, "left shift"))
+		if (IsKeyDown(input, "left ctrl"))
 			MoveCamera(&game->camera, y_axis, -10 * delta);
 		if (IsKeyDown(input, "space"))
 			MoveCamera(&game->camera, y_axis, 10 * delta);
@@ -125,6 +125,11 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	Matrix4 camera_mat = Matrix4_translate(-game->camera.position.x, -game->camera.position.y,
 		-game->camera.position.z) * Matrix4_rotate(game->camera.rotation);
 
+	BeginModelRenderer(voxel_render_context, Matrix4_identity(), GL_FRONT);
+	RenderModel(voxel_render_context, &game->sword, Vector3(3.0f , 0.0f, -5.0f), Vector3(0.5f, 0.5f, 0.5f), 
+		Quaternion(-45.0f, Vector3(0.0f, 0.0f, 1.0f)) * Quaternion(90.0f, y_axis));
+	EndModelRenderer();
+
 	BeginModelRenderer(voxel_render_context, camera_mat);
 	SetShaderUniform(&voxel_render_context->diffuse, "light_direction", Vector3(-1.0f, -1.0f, 1.0f));
 	RenderModel(voxel_render_context, &game->model, Matrix4_scale(1.0f, 1.0f, 1.0f) * 
@@ -133,30 +138,9 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 
 	BeginVoxelRenderer(voxel_render_context, camera_mat);
 	RenderVoxel(voxel_render_context, Vector3(0.0f, -0.5f, 0.0f), Vector3(300.0f, 1.0f, 150.0f), 0, 150, 0, 255);
-	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, rot, 0.0f), 255, 0, 0, 255);
-	//RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f), 255, 0, 0, 255);
-
-	RenderVoxel(voxel_render_context, Vector3(), Vector3(1.0f, 1.0f, 1.0f)
-		+ (GetForward(game->camera.rotation) * 10), 255, 0, 0, 255);
 	EndVoxelRenderer();
 
 	BeginRenderer(render_context);
-	std::string p = "X: " + std::to_string(game->camera.position.x) + " Y: " + 
-		std::to_string(game->camera.position.y) + " Z: " + std::to_string(game->camera.position.z);
-	RenderString(render_context, 40.0f, 60.0f, p.c_str(), 0.0f);
-
-	/*std::string f = "X: " + std::to_string(game->camera.forward.x) + " Y: " +
-		std::to_string(game->camera.forward.y) + " Z: " + std::to_string(game->camera.forward.z);
-	RenderString(render_context, 40.0f, 80.0f, f.c_str(), 0.0f);
-
-	std::string u = "X: " + std::to_string(game->camera.up.x) + " Y: " +
-		std::to_string(game->camera.up.y) + " Z: " + std::to_string(game->camera.up.z);
-	RenderString(render_context, 40.0f, 100.0f, u.c_str(), 0.0f);
-	*/
-	Vector3 cross = GetRight(game->camera.rotation);
-	std::string c = "X: " + std::to_string(cross.x) + " Y: " +
-		std::to_string(cross.y) + " Z: " + std::to_string(cross.z);
-	RenderString(render_context, 40.0f, 120.0f, c.c_str(), 0.0f);
 
 	EndRenderer();
 }

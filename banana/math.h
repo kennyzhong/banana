@@ -116,8 +116,8 @@ struct Quaternion
 	Quaternion() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) {};
 	Quaternion(float angle, Vector3 axis)
 	{
-		float sin_half_angle = (float)sinf(ToDegrees(angle / 2));
-		float cos_half_angle = (float)cosf(ToDegrees(angle / 2));
+		float sin_half_angle = (float)sinf(ToRadians(angle / 2));
+		float cos_half_angle = (float)cosf(ToRadians(angle / 2));
 
 		x = axis.x * sin_half_angle;
 		y = axis.y * sin_half_angle;

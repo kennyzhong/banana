@@ -136,7 +136,7 @@ void BeginVoxelRenderer(VoxelRenderContext *context, Matrix4 camera)
 	glBindVertexArray(context->vao);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 	BindShader(&context->diffuse);
 	SetShaderUniform(&context->diffuse, "camera", camera);
 }
@@ -153,11 +153,11 @@ void EndVoxelRenderer()
 void RenderVoxel(VoxelRenderContext *context, Vector3 position, Vector3 scale,
 	uint8 r, uint8 g, uint8 b, uint8 a)
 {
-	RenderVoxel(context, position, scale, Vector3(), r, g, b, a);
+	RenderVoxel(context, position, scale, Quaternion(), r, g, b, a);
 }
 
 void RenderVoxel(VoxelRenderContext *context, Vector3 position, Vector3 scale,
-	Vector3 rotation, uint8 r, uint8 g, uint8 b, uint8 a, bool outline)
+	Quaternion rotation, uint8 r, uint8 g, uint8 b, uint8 a, bool outline)
 {
 	float32 rr = (1.0f / 255.0f)*(float32)r;
 	float32 gg = (1.0f / 255.0f)*(float32)g;
@@ -166,9 +166,7 @@ void RenderVoxel(VoxelRenderContext *context, Vector3 position, Vector3 scale,
 	SetShaderUniform(&context->diffuse, "instanced", 0);
 	SetShaderUniform(&context->diffuse, "color", rr, gg, bb, aa);
 	Matrix4 world = Matrix4_scale(scale.x, scale.y, scale.z) 
-		* Matrix4_rotate(rotation.z, 0.0f, 0.0f, 1.0f)
-		* Matrix4_rotate(rotation.y, 0.0f, 1.0f, 0.0f)
-		* Matrix4_rotate(rotation.x, 1.0f, 0.0f, 0.0f)
+		* Matrix4_rotate(rotation)
 		* Matrix4_translate(position.x, position.y, position.z);
 	SetShaderUniform(&context->diffuse, "world", world);
 	GLenum mode = GL_TRIANGLES;
@@ -178,12 +176,12 @@ void RenderVoxel(VoxelRenderContext *context, Vector3 position, Vector3 scale,
 
 #include <vector>
 
-void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera)
+void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera, GLenum cull_face)
 {
 	SetShaderUniform(&context->diffuse, "camera", camera);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-	glCullFace(GL_BACK);
+	glCullFace(cull_face);
 }
 
 void EndModelRenderer()
@@ -276,12 +274,10 @@ void RenderModel(VoxelRenderContext *context, Model *model, Matrix4 transform)
 }
 
 void RenderModel(VoxelRenderContext *context, Model *model, Vector3 position, Vector3 scale,
-	Vector3 rotation)
+	Quaternion rotation)
 {
 	Matrix4 world = Matrix4_scale(scale.x, scale.y, scale.z)
-		* Matrix4_rotate(rotation.z, 0.0f, 0.0f, 1.0f)
-		* Matrix4_rotate(rotation.y, 0.0f, 1.0f, 0.0f)
-		* Matrix4_rotate(rotation.x, 1.0f, 0.0f, 0.0f)
+		* Matrix4_rotate(rotation)
 		* Matrix4_translate(position.x, position.y, position.z);
 	RenderModel(context, model, world);
 }

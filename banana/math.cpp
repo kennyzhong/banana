@@ -409,12 +409,12 @@ Matrix4 Matrix4_lookat(Vector3 f, Vector3 up, Vector3 r)
 
 float ToDegrees(float radians)
 {
-	return tanf(radians*M_PI / 180.0f);
+	return radians * 180.0f / M_PI;
 }
 
 float ToRadians(float degrees)
 {
-	return ((180.0f * degrees) / M_PI);
+	return degrees * M_PI / 180.0f;
 }
 
 float Clamp(float input, float  min, float max)

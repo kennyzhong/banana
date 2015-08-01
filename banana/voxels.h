@@ -26,7 +26,7 @@ void RenderVoxel(VoxelRenderContext *context, Vector3 position,  Vector3 scale,
 	uint8 r, uint8 g, uint8 b, uint8 a);
 
 void RenderVoxel(VoxelRenderContext *context, Vector3 position, Vector3 scale,
-	Vector3 rotation, uint8 r, uint8 g, uint8 b, uint8 a, bool outline = false);
+	Quaternion rotation, uint8 r, uint8 g, uint8 b, uint8 a, bool outline = false);
 
 struct Model
 {
@@ -42,11 +42,11 @@ struct Model
 
 #include "mvload.h"
 
-void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera);
+void BeginModelRenderer(VoxelRenderContext *context, Matrix4 camera, GLenum cull_face = GL_BACK);
 void EndModelRenderer();
 void InitializeModel(VoxelRenderContext *context, Model *model, MV_Model *mv_model);
 void RenderModel(VoxelRenderContext *context, Model *model, Matrix4 transform);
 void RenderModel(VoxelRenderContext *context, Model *model, Vector3 position, Vector3 scale,
-	Vector3 rotation);
+	Quaternion rotation);
 
 #endif // VOXELS_H
