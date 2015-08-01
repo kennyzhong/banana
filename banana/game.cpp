@@ -87,23 +87,23 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 
 		Vector2 mouse_delta = input->mouse_pos - center;
 
-		CameraRotateX(&game->camera, (mouse_delta.y) * -5 * delta);
-		CameraRotateY(&game->camera, (mouse_delta.x) * -5 * delta);
+		CameraRotateX(&game->camera, (mouse_delta.y) * 5 * delta);
+		CameraRotateY(&game->camera, (mouse_delta.x) * 5 * delta);
 
 		if (IsKeyDown(input, "right"))
-			CameraRotateY(&game->camera, -100 * delta);
-		if (IsKeyDown(input, "left"))
 			CameraRotateY(&game->camera, 100 * delta);
+		if (IsKeyDown(input, "left"))
+			CameraRotateY(&game->camera, -100 * delta);
 		if (IsKeyDown(input, "up"))
-			CameraRotateX(&game->camera, 100 * delta);
+			CameraRotateX(&game->camera, -100 * delta);
 		if (IsKeyDown(input, "down"))
-			CameraRotateX(&game->camera, -100.0f * delta);
+			CameraRotateX(&game->camera, 100.0f * delta);
 
 
 		if (IsKeyDown(input, "w"))
-			MoveCamera(&game->camera, Vector3(0.0f, 0.0f, 1.0f), 10 * delta);
+			MoveCamera(&game->camera, GetForward(game->camera.rotation), 10 * delta);
 		if (IsKeyDown(input, "s"))
-			MoveCamera(&game->camera, GetForward(game->camera.rotation), -10 * delta);
+			MoveCamera(&game->camera, GetBackward(game->camera.rotation), 10 * delta);
 		if (IsKeyDown(input, "a"))
 			MoveCamera(&game->camera, GetLeft(game->camera.rotation), 10 * delta);
 		if (IsKeyDown(input, "d"))
@@ -126,7 +126,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	RenderClear(render_context, 50, 203, 255, 255, GL_DEPTH_BUFFER_BIT);
 	// Matrix4_lookat(game->camera.position, game->camera.position + game->camera.forward, game->camera.up)
 	Matrix4 camera_mat = Matrix4_translate(-game->camera.position.x, -game->camera.position.y,
-		-game->camera.position.z) * Matrix4_rotate(game->camera.rotation);
+		-game->camera.position.z) * Matrix4_rotate(-game->camera.rotation);
 
 	BeginModelRenderer(voxel_render_context, camera_mat);
 	SetShaderUniform(&voxel_render_context->diffuse, "light_direction", Vector3(-1.0f, -1.0f, 1.0f));

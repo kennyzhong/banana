@@ -1,6 +1,6 @@
 #include "gl_util.h"
 
-GLuint Shader::bound_program = NULL;
+Shader * Shader::bound = 0;
 
 internal void CheckShaderError(GLuint shader, GLuint flag, bool is_program, const char *error_message)
 {
@@ -126,8 +126,7 @@ void DestroyShader(Shader *shader)
 
 void BindShader(Shader *shader)
 {
-	
-		glUseProgram(shader->program);
+	glUseProgram(shader->program);
 }
 
 void SetShaderUniform(Shader *shader, char *name, Matrix4 mat)

@@ -15,7 +15,7 @@ struct Shader
 	GLuint fragment;
 	std::map<std::string, GLint> uniforms;
 	std::map<std::string, GLint> attributes;
-	local_persist GLuint bound_program;
+	local_persist Shader *bound;
 };
 
 Shader CreateShader(char *filename_vertex, char *filename_fragment);

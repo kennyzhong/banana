@@ -22,6 +22,6 @@ void main()
 		mvp *= world_instanced;
 
 	gl_Position =  mvp * vec4(position, 1.0);
-	normal0 =  (mvp * vec4(normal, 0.0)).xyz;
+	normal0 =  (projection * vec4(normal, 0.0)).xyz;
 	color_instanced0 = color_instanced;
 }

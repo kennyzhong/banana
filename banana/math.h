@@ -129,11 +129,12 @@ struct Quaternion
 
 	Quaternion operator*(const Quaternion &other);
 	Quaternion operator*(const Vector3 &other);
+	Quaternion operator-();
 };
 
 float Length(Quaternion quat);
 void Normalize(Quaternion &quat);
-void Conjugate(Quaternion &quat);
+Quaternion Conjugate(Quaternion quat);
 Vector3 GetForward(Quaternion quat);
 Vector3 GetBackward(Quaternion quat);
 Vector3 GetRight(Quaternion quat);

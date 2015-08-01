@@ -237,8 +237,7 @@ void Rotate(Vector3 &input, float angle, Vector3 axis)
 
 void Rotate(Vector3 &input, Quaternion quat)
 {
-	Quaternion conjugate = quat;
-	Conjugate(conjugate);
+	Quaternion conjugate = Conjugate(quat);
 
 	Quaternion w = quat * input * conjugate;
 
@@ -440,11 +439,9 @@ void Normalize(Quaternion &quat)
 	quat.w /= length;
 }
 
-void Conjugate(Quaternion &quat)
+Quaternion Conjugate(Quaternion quat)
 {
-	quat.x = -quat.x;
-	quat.y = -quat.y;
-	quat.z = -quat.z;
+	return Quaternion(-quat.x, -quat.y, -quat.z, quat.w);
 }
 
 Quaternion Quaternion::operator*(const Quaternion &other)
@@ -469,6 +466,11 @@ Quaternion Quaternion::operator*(const Vector3 &other)
 	result.z = w * other.z + x * other.y - y * other.x;
 
 	return result;
+}
+
+Quaternion Quaternion::operator-()
+{
+	return Quaternion(-x, -y, -z, w);
 }
 
 Vector3 GetForward(Quaternion quat)
