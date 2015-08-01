@@ -475,30 +475,30 @@ Quaternion Quaternion::operator-()
 
 Vector3 GetForward(Quaternion quat)
 {
-	Vector3 result = Vector3(0.0f, 0.0f, 1.0f);
-	Rotate(result, quat);
-	return result;
+	Vector3 forward = Vector3(2.0f * (quat.x * quat.z - quat.w * quat.y), 2.0f *
+		(quat.y * quat.z + quat.w * quat.x), 1.0f - 2.0f * (quat.x * quat.x + quat.y * quat.y));
+	return forward;
 }
 
 Vector3 GetBackward(Quaternion quat)
 {
-	Vector3 result = Vector3(0.0f, 0.0f, -1.0f);
-	Rotate(result, quat);
-	return result;
+	Vector3 backward = Vector3(-2.0f * (quat.x * quat.z - quat.w * quat.y), -2.0f *
+		(quat.y * quat.z + quat.w * quat.x), -(1.0f - 2.0f * (quat.x * quat.x + quat.y * quat.y)));
+	return backward;
 }
 
 Vector3 GetRight(Quaternion quat)
 {
-	Vector3 result = Vector3(1.0f, 0.0f, 0.0f);
-	Rotate(result, quat);
-	return result;
+	Vector3 right = Vector3(1.0f - 2.0f * (quat.y * quat.y + quat.z * quat.z), 2.0f *
+		(quat.x * quat.y - quat.w * quat.z), 2.0f * (quat.x * quat.z + quat.w * quat.y));
+	return right;
 }
 
 Vector3 GetLeft(Quaternion quat)
 {
-	Vector3 result = Vector3(-1.0f, 0.0f, 0.0f);
-	Rotate(result, quat);
-	return result;
+	Vector3 left = Vector3(-(1.0f - 2.0f * (quat.y * quat.y + quat.z * quat.z)), -2.0f *
+		(quat.x * quat.y - quat.w * quat.z), -2.0f * (quat.x * quat.z + quat.w * quat.y));
+	return left;
 }
 
 Vector3 GetUp(Quaternion quat)

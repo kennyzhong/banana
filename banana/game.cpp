@@ -24,7 +24,9 @@ void CameraRotateY(Camera *camera, float angle)
 
 void CameraRotateX(Camera *camera, float angle)
 {
-	Quaternion n = Quaternion(angle, GetRight(camera->rotation)) * camera->rotation;
+	Vector3 right = Vector3(1.0f, 0.0f, 0.0f);
+	Rotate(right, camera->rotation);
+	Quaternion n = Quaternion(angle, right) * camera->rotation;
 	Normalize(n);
 	camera->rotation = n;
 }
@@ -87,8 +89,8 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 
 		Vector2 mouse_delta = input->mouse_pos - center;
 
-		CameraRotateX(&game->camera, (mouse_delta.y) * 5 * delta);
-		CameraRotateY(&game->camera, (mouse_delta.x) * 5 * delta);
+		CameraRotateX(&game->camera, (mouse_delta.y) * -5 * delta);
+		CameraRotateY(&game->camera, (mouse_delta.x) * -5 * delta);
 
 		if (IsKeyDown(input, "right"))
 			CameraRotateY(&game->camera, 100 * delta);
@@ -113,11 +115,6 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 		if (IsKeyDown(input, "space"))
 			MoveCamera(&game->camera, y_axis, 10 * delta);
 
-		/*if (IsKeyDown(input, "right"))
-			rot -= 100.0f * delta;
-		if (IsKeyDown(input, "left"))
-			rot += 100.0f * delta;*/
-
 		game->quat = Quaternion(100 * delta, Vector3(0.0f, 1.0f, 0.0f)) * game->quat;
 
 		SetMousePosition(input, Vector2(0.5f, 0.5f));\
@@ -126,7 +123,7 @@ void GameUpdateAndRender(GameMemory *game_memory, InputData *input, RenderContex
 	RenderClear(render_context, 50, 203, 255, 255, GL_DEPTH_BUFFER_BIT);
 	// Matrix4_lookat(game->camera.position, game->camera.position + game->camera.forward, game->camera.up)
 	Matrix4 camera_mat = Matrix4_translate(-game->camera.position.x, -game->camera.position.y,
-		-game->camera.position.z) * Matrix4_rotate(-game->camera.rotation);
+		-game->camera.position.z) * Matrix4_rotate(game->camera.rotation);
 
 	BeginModelRenderer(voxel_render_context, camera_mat);
 	SetShaderUniform(&voxel_render_context->diffuse, "light_direction", Vector3(-1.0f, -1.0f, 1.0f));
